@@ -1,0 +1,213 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  --orange: #F2C32D;
+  --orange-dark: #d4a507;
+  --input: #FAFAFA;
+  --black: #393939;
+}
+
+/* Estiliza a barra de rolagem */
+::-webkit-scrollbar {
+  width: 2px; /* Largura da barra de rolagem */
+  height: 0px; /* Altura para rolagem horizontal */
+}
+
+/* Estiliza o fundo do "track" */
+::-webkit-scrollbar-track {
+  background: #f4f4f4; /* Cor de fundo da trilha */
+  border-radius: 6px; /* Arredondamento */
+}
+
+/* Estiliza a parte "thumb" da barra de rolagem */
+::-webkit-scrollbar-thumb {
+  background: #888; /* Cor do thumb */
+  border-radius: 6px; /* Arredondamento */
+  border: 2px solid #f4f4f4; /* Espaço entre thumb e track */
+}
+
+/* Ao passar o mouse (hover) */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Cor mais escura no hover */
+}
+
+html {
+  @apply bg-white
+}
+
+
+.bg-global {
+  @apply bg-[#F3F3F3]
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  font-weight: 300;
+  /* overflow-y: hidden; */
+}
+
+/* Arquivo CSS */
+
+@media (max-width: 768px) and (min-width: 549px) {
+  .custom-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3 colunas */
+  }
+}
+
+@media (max-width: 549px) and (min-width: 320px) {
+  .custom-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 colunas */
+  }
+}
+
+@media (max-width: 320px) {
+  .custom-grid {
+    grid-template-columns: repeat(1, 1fr); /* 1 coluna */
+  }
+}
+
+.bg-green-300 { background-color: #a0d2a3; }
+.bg-green-500 { background-color: #74c476; }
+.bg-green-600 { background-color: #4cae4f; }
+
+.helvetica-sans-serif {
+  font-family: 'Inter', 'Helvetica', 'Arial', sans-serif;
+}
+
+.monserrat {
+  font-family: "Montserrat", sans-serif;
+}
+
+.mobile-input {
+  background-color: var(--input);
+  border: none;
+  padding: 24px 16px;
+}
+
+.poppins-thin {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.poppins-extralight {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.poppins-light {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.poppins-medium {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.poppins-semibold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.poppins-bold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.poppins-extrabold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.poppins-black {
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.poppins-thin-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: italic;
+}
+
+.poppins-extralight-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: italic;
+}
+
+.poppins-light-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.poppins-regular-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.poppins-medium-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.poppins-semibold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.poppins-bold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.poppins-extrabold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: italic;
+}
+
+.poppins-black-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
+  font-style: italic;
+}
+
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+  }
+}

@@ -1,0 +1,27 @@
+{
+    "theme_color": "#ffffff",
+    "background_color": "#ffffff",
+    "icons": [    
+        {
+            "purpose": "maskable",
+            "sizes": "512x512",
+            "src": "icon512_maskable.png",
+            "type": "image/png"
+        },
+        {
+            "purpose": "any",
+            "sizes": "512x512",
+            "src": "icon512_rounded.png",
+            "type": "image/png"
+        }
+    ],
+    "orientation": "any",
+    "display": "standalone",
+    "dir": "auto",
+    "lang": "pt-PT",
+    "name": "Cliente Automarked",
+    "short_name": "Cliente Automarked",
+    "start_url": "https://clientauto.vercel.app",
+    "scope": "https://clientauto.vercel.app",
+    "description": "Automarked"
+}
