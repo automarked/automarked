@@ -16,7 +16,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import useInventory from "@/hooks/useInventory";
 import { useAuth } from "@/contexts/AuthContext";
 
 const CarGrid: React.FC<{ inventory: InventoryItem[], searchOnList: string, onDelete: (item: InventoryItem) => void }> = ({ inventory, searchOnList, onDelete }) => {
