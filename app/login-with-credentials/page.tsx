@@ -11,6 +11,7 @@ import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
 import Loader from "@/components/loader";
 import Cookies from 'js-cookie'
+import { Badge } from "@/components/ui/badge";
 
 const LoginWithCredentials = () => {
   const router = useRouter();
@@ -51,6 +52,9 @@ const LoginWithCredentials = () => {
   return (
     <div className="flex flex-col bg-white py-6 items-center justify-center min-h-screen">
       <div className="flex flex-col items-center justify-center max-w-[390px] min-w-[293px] w-full h-full px-6   px-6 bg-white ">
+
+        <Badge variant="outline" className="mb-4 text-xl">Vendedor</Badge>
+
         <Image
           src="/images/logo.png"
           alt="Logo"
