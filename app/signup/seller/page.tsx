@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
@@ -13,6 +13,8 @@ import { useRouter } from 'next/navigation';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChevronLeft } from 'lucide-react';
 import GoBack from '@/components/goBack';
+import { AUTHORIZED_ADMINS } from '@/constants/auth';
+import { useAuth } from '@/contexts/AuthContext';
 
 const customerSchema = z.object({
     firstName: z.string().nonempty("O primeiro nome é obrigatório"),
@@ -36,9 +38,38 @@ const sellerSchema = customerSchema.extend({
     path: ["repeatedPassword"],
 });
 
-
 const RegisterForm = () => {
     const router = useRouter()
+    const { user, isLoggedIn } = useAuth();
+
+    useEffect(() => {
+        const verifyAccess = () => {
+            // Check if user is logged in
+            if (!isLoggedIn || !user) {
+                router.push('/login-with-credentials');
+                return;
+            }
+
+            // Verify admin credentials and role
+            const isAuthorizedAdmin = AUTHORIZED_ADMINS.some(
+                admin => admin.email === user.email &&
+                    admin.permissions.includes('CREATE_USERS')
+            );
+
+            if (!isAuthorizedAdmin) {
+                router.push('/login-with-credentials');
+                return;
+            }
+        };
+
+        verifyAccess();
+    }, [user, isLoggedIn, router]);
+
+    // Only render for verified admins
+    if (!user || !AUTHORIZED_ADMINS.some(admin => admin.email === user.email)) {
+        return null;
+    }
+
     const showToast = (title: string, description: string) => {
         toast({
             title,
@@ -121,7 +152,7 @@ const RegisterForm = () => {
     return (
         <div className="flex pb-20 pt-20 flex-col items-center max-w-md mx-auto w-full justify-center min-h-screen bg-white px-6">
 
-           <GoBack className='' />
+            <GoBack className='' />
 
             {/* Logo */}
             <div className="mb-6">

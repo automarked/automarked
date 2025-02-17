@@ -41,6 +41,8 @@ const Sidebar: React.FC<{ currentProfile: IUser; isOpen: boolean, closeSidebar: 
             <nav className="flex-1 mt-4 px-4 space-y-2">
                 <SidebarItem closeSidebar={closeSidebar} icon={<BarChart2 />} label="Dashboard" link="/seller" />
                 <SidebarItem closeSidebar={closeSidebar} icon={<FaCar />} label="Inventário" link="/seller/inventory" />
+                <SidebarItem closeSidebar={closeSidebar} icon={<FaCar />} label="Comerciais" link="/seller/account-settings" />
+
                 <SidebarGroup title="Tempo Real">
                     <div className="relative">
                         <SidebarItem closeSidebar={closeSidebar} icon={<FaComment />} label="Chat" link="/seller/chat" />

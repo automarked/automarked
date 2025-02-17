@@ -18,10 +18,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser } from '@/contexts/userContext';
 import { toast } from '@/hooks/use-toast';
-import useInventory from '@/hooks/useInventory';
 import { Colors } from '@/constants/colors';
 import Image from 'next/image';
 import Loader from '@/components/loader';
+import { useInventoryContext } from '@/contexts/InventoryContext';
 
 type GalleryItemProps = {
   add: (imageUrl: string[]) => void;
@@ -173,7 +173,7 @@ const VehicleForm = () => {
   const { user } = useUser()
   const { profile } = useUser(user?.uid ?? '')
   const { vehicle: vehicleData } = useVehicle();
-  const { addVehicle } = useInventory(user?.uid ?? '')
+  const { addVehicle } = useInventoryContext()
   const { brandsList } = useBrands();
   const [brand, setBrand] = useState<Brand>();
   const [currentSection, setCurrentSection] = useState(0);

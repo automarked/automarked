@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useState } from "react";
-import useInventory from "@/hooks/useInventory";
 import { useUser } from "@/contexts/userContext";
 import SearchInput from "@/components/both/input-search";
 import CarGrid from "@/components/both/car-grid";
@@ -10,10 +9,11 @@ import { FaPlus } from "react-icons/fa";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import Loader from "@/components/loader";
+import { useInventoryContext } from "@/contexts/InventoryContext";
 
 const Inventory = () => {
     const { user } = useAuth();
-    const { inventory, removeVehicle: deleteVehicleFromInventory } = useInventory(user?.uid ?? '');
+    const { inventory, removeVehicle: deleteVehicleFromInventory } = useInventoryContext();
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 

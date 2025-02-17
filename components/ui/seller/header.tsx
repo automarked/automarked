@@ -21,7 +21,6 @@ const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: stri
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
 
   useEffect(() => {
-    console.log("HEADER", imageURL);
 
   }, [imageURL])
   return (

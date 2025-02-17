@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
-import { Vehicle } from "@/models/vehicle";
+import { toast } from "@/hooks/use-toast";
+import { createdInstance } from "@/hooks/useApi";
 import { InventoryItem } from "@/models/inventory";
-import { createdInstance } from "./useApi";
-import { toast } from "./use-toast";
+import { Vehicle } from "@/models/vehicle";
+import React, { createContext, useContext, ReactNode, useCallback, useState, useEffect } from "react";
 
 interface UseInventoryResult {
     inventory: InventoryItem[];
@@ -16,7 +16,14 @@ interface UseInventoryResult {
     fetchTotalInventoryValue: () => void;
 }
 
-const useInventory = (userId: string): UseInventoryResult => {
+interface InventoryProviderProps {
+    userId: string;
+    children: ReactNode;
+}
+
+const InventoryContext = createContext<UseInventoryResult | undefined>(undefined);
+
+export const InventoryProvider = ({ userId, children }: InventoryProviderProps) => {
     const [inventory, setInventory] = useState<InventoryItem[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -112,17 +119,27 @@ const useInventory = (userId: string): UseInventoryResult => {
         };
     }, [userId]);
 
-    return {
-        inventory,
-        loading,
-        error,
-        fetchInventory,
-        addVehicle,
-        updateVehicleQuantity,
-        removeVehicle,
-        totalInventoryValue,
-        fetchTotalInventoryValue,
-    };
+    return (
+        <InventoryContext.Provider value={{
+            inventory,
+            loading,
+            error,
+            fetchInventory,
+            addVehicle,
+            updateVehicleQuantity,
+            removeVehicle,
+            totalInventoryValue,
+            fetchTotalInventoryValue,
+        }}>
+            {children}
+        </InventoryContext.Provider>
+    );
 };
 
-export default useInventory;
+export const useInventoryContext = (): UseInventoryResult => {
+    const context = useContext(InventoryContext);
+    if (context === undefined) {
+        throw new Error("useInventoryContext must be used within an InventoryProvider");
+    }
+    return context;
+};

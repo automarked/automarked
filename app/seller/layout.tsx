@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { secureGet } from "@/secure/sessions";
 import { ChatProvider } from "@/contexts/chatContext";
 import { getCookie } from "@/secure/cookies";
+import { InventoryProvider } from "@/contexts/InventoryContext";
 
 export default function SellerLayout({ children }: { children: React.ReactNode }) {
     const { user: us } = useAuth();
@@ -38,6 +39,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
         return (
             <>
                 <NotificationProvider userId={us?.uid ?? ''}>
+                    <InventoryProvider userId={us?.uid ?? ''}>
                     <ChatProvider senderId={us?.uid ?? ''}>
                         <div className="flex-1 h-screen p-0 flex relative">
                             <Sidebar closeSidebar={closeSidebar} currentProfile={profile} isOpen={isOpen} />
@@ -53,6 +55,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
                             </div>
                         </div>
                     </ChatProvider>
+                    </InventoryProvider>
                 </NotificationProvider>
                 <WhatsAppFloatingButton />
             </>

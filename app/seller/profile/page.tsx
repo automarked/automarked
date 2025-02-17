@@ -11,6 +11,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import useImage from "@/hooks/useImage";
 import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from 'next/navigation';
+import { AUTHORIZED_ADMINS } from "@/constants/auth";
 
 const ProfileForm = () => {
     const {
@@ -30,6 +32,27 @@ const ProfileForm = () => {
     const [isLoading, setIsLoading] = useState(false);
     const { images, actions } = useImage()
     const [imagePreview, setImagePreview] = useState<string>()
+    const [isAuthorized, setIsAuthorized] = useState<boolean>(false)
+    const router = useRouter()
+
+    useEffect(() => {
+        const verifyAccess = () => {
+
+            // Verify admin credentials and role
+            const isAuthorizedAdmin = AUTHORIZED_ADMINS.some(
+                admin => admin.email === profile?.email &&
+                    admin.permissions.includes('CREATE_USERS')
+            );
+
+            if (isAuthorizedAdmin) {                
+                setIsAuthorized(true)
+            }
+        };
+
+        verifyAccess();
+    }, [profile, router]);
+
+
     const handleLogout = useCallback(async () => {
         await logout()
         signout()
@@ -37,22 +60,14 @@ const ProfileForm = () => {
     }, []);
 
     const handleEditProfile = useCallback(() => {
-        console.log("Salvando perfil...");
-
-        console.log(imagePreview);
 
         if (imagePreview) {
-            console.log("Salvando perfil...");
             actions.saveAll().then(urls => {
                 if (urls) {
-                    console.log(urls);
 
                     handleProfileChange('background', urls[0])
-                    console.log("URL salva...");
-                    console.log(profile);
 
                     handleUpdateProfile(urls[0])
-                    console.log("Salvo!");
                 }
             })
         } else handleUpdateProfile()
@@ -118,7 +133,7 @@ const ProfileForm = () => {
                             className="mobile-input"
                             placeholder="Apelido"
                         />
-                           <Input
+                        <Input
                             type="text"
                             value={profile.municipality}
                             onChange={(e) => handleProfileChange('municipality', e.target.value)}
@@ -229,6 +244,15 @@ const ProfileForm = () => {
                         >
                             Sair
                         </button>
+                        {isAuthorized && (
+                            <button
+                                className="w-full bg-blue-950 text-white py-3 rounded-full mt-6"
+                                onClick={() => router.push("/signup/seller")}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? "Loading..." : "Cadastrar usuário"}
+                            </button>
+                        )}
                     </div>
                     <br /><br />
                     {profile.type === "seller" && (

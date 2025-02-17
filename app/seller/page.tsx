@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { formatCurrency } from '@/scripts/format-price';
 import { FaCar, FaPlus } from 'react-icons/fa';
-import useInventory from '@/hooks/useInventory';
 import { Car, CheckCheckIcon, CircleDotDashed, LayoutDashboard, TicketX } from 'lucide-react';
 import SearchInput from '@/components/both/input-search';
 import { useRouter } from 'next/navigation';
@@ -19,23 +18,15 @@ import { useUser } from '@/contexts/userContext';
 import { MdManageAccounts } from "react-icons/md";
 import Sale from '@/models/sale';
 import { createdInstance } from '@/hooks/useApi';
+import { useInventoryContext } from '@/contexts/InventoryContext';
 
-type Transaction = {
-    id: string;
-    title: string;
-    description: string;
-    amount: string;
-    date: string;
-    isIncome: boolean;
-    icon: JSX.Element;
-};
 
 const SellerDashboard = () => {
     const { user } = useAuth()
     const { profile } = useUser(user?.uid ?? '')
     const [input, setInput] = useState('')
     const { getCollaborators, collaborators } = useUser(user?.uid ?? '')
-    const { totalInventoryValue, inventory } = useInventory(profile?.userId ?? '');
+    const { totalInventoryValue, inventory } = useInventoryContext();
     const [sales, setSales] = useState<Sale[]>([])
     const fetchSales = async () => {
         try {
