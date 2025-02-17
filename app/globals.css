@@ -16,66 +16,76 @@
 
 /* Estiliza a barra de rolagem */
 ::-webkit-scrollbar {
-  width: 2px; /* Largura da barra de rolagem */
-  height: 0px; /* Altura para rolagem horizontal */
+  width: .5px;
 }
 
 /* Estiliza o fundo do "track" */
 ::-webkit-scrollbar-track {
-  background: #f4f4f4; /* Cor de fundo da trilha */
-  border-radius: 6px; /* Arredondamento */
+  background: #f4f4f4;
+  /* Cor de fundo da trilha */
+  border-radius: 6px;
+  /* Arredondamento */
 }
 
 /* Estiliza a parte "thumb" da barra de rolagem */
 ::-webkit-scrollbar-thumb {
-  background: #888; /* Cor do thumb */
-  border-radius: 6px; /* Arredondamento */
-  border: 2px solid #f4f4f4; /* Espaço entre thumb e track */
+  background: #888;
+  /* Cor do thumb */
+  border-radius: 6px;
+  /* Arredondamento */
+  border: 2px solid #f4f4f4;
+  /* Espaço entre thumb e track */
 }
 
 /* Ao passar o mouse (hover) */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555; /* Cor mais escura no hover */
+  background: #555;
+  /* Cor mais escura no hover */
 }
 
 html {
-  @apply bg-white
-}
-
-
-.bg-global {
-  @apply bg-[#F3F3F3]
+  @apply bg-gray-50
 }
 
 body {
   font-family: "Roboto", sans-serif;
   font-weight: 300;
-  /* overflow-y: hidden; */
 }
 
 /* Arquivo CSS */
 
 @media (max-width: 768px) and (min-width: 549px) {
   .custom-grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 colunas */
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 colunas */
   }
 }
 
 @media (max-width: 549px) and (min-width: 320px) {
   .custom-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 colunas */
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 colunas */
   }
 }
 
 @media (max-width: 320px) {
   .custom-grid {
-    grid-template-columns: repeat(1, 1fr); /* 1 coluna */
+    grid-template-columns: repeat(1, 1fr);
+    /* 1 coluna */
   }
 }
 
-.bg-green-300 { background-color: #a0d2a3; }
-.bg-green-500 { background-color: #74c476; }
-.bg-green-600 { background-color: #4cae4f; }
+.bg-green-300 {
+  background-color: #a0d2a3;
+}
+
+.bg-green-500 {
+  background-color: #74c476;
+}
+
+.bg-green-600 {
+  background-color: #4cae4f;
+}
 
 .helvetica-sans-serif {
   font-family: 'Inter', 'Helvetica', 'Arial', sans-serif;
@@ -86,7 +96,7 @@ body {
 }
 
 .mobile-input {
-  background-color: var(--input);
+  background-color: #fff;
   border: none;
   padding: 24px 16px;
 }

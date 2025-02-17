@@ -41,14 +41,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     useEffect(() => {
         const checkLogin = async () => {
+
             const token = getCookie("access");
             if (token) {
                 setIsLoggedIn(true);  // Usuário está logado
             } else {
-                setIsLoggedIn(false);  // Usuário não está logado
+                setIsLoggedIn(false);
             }
         };
-
         checkLogin();
     }, []); // Rodar apenas no primeiro carregamento
 
@@ -59,35 +59,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, []);
 
-    const login = useCallback(async (email: string, password: string) => {
-        setIsLoading(true);
-        setError(null);  // Reset previous errors
-        try {
-            const response = await createdInstance.post('/login', { email, password });
-            if (response.status === 200) {
-                const { token, user, type } = response.data.record as ISignInWithEmailAndPassword;
+   // Update login method
+const login = useCallback(async (email: string, password: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+        const response = await createdInstance.post('/login', { email, password });
+        if (response.status === 200) {
+            const { token, user, type } = response.data.record as ISignInWithEmailAndPassword;
 
-                // Save tokens and user info securely
-                setCookie('access', token.accessToken);
-                setCookie('expires-access', token.expirationTime.toString());
-                setCookie('refresh-access', token.refreshToken);
-                setCookie('secure-user', user);
-                setCookie('user-type', type);
+            setCookie('access', token.accessToken);
+            setCookie('expires-access', token.expirationTime.toString());
+            setCookie('refresh-access', token.refreshToken);
+            setCookie('secure-user', user);
+            setCookie('user-type', type);
 
-                setUser(user);
-                setIsLoggedIn(true);
-                return type
-            } else {
-                setError('Email ou senha inválidos!');
-                return false
-            }
-        } catch (err) {
-            setError('Erro ao fazer login!');
-            return false
-        } finally {
-            setIsLoading(false);
+            setUser(user);
+            setIsLoggedIn(true);
+            return type;
         }
-    }, []);
+        return false;
+    } catch (err) {
+        setError('Erro ao fazer login!');
+        return false;
+    } finally {
+        setIsLoading(false);
+    }
+}, []);
+
 
     const logout = useCallback(async () => {
         removeCookie('access')

@@ -1,13 +1,13 @@
 'use server'
 
-import Landing from "./landing/page";
+import LoginWithCredentials from "./login-with-credentials/page";
 
 
-const Index: React.FC = async () => {
+const LoginScreen: React.FC = async () => {
 
   return (
-      <Landing />
+    <LoginWithCredentials />
   );
 };
 
-export default Index;
+export default LoginScreen;

@@ -2,7 +2,6 @@ import { FC, useCallback } from "react";
 import { Plus, Smile, Mic } from "lucide-react";
 import { LuSend } from "react-icons/lu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { apiBaseURL } from "@/constants/api";
 import { cn } from "@/lib/utils";
 import { Textarea } from "../ui/textarea";
 import { useChatContext } from "@/contexts/chatContext";
@@ -29,7 +28,7 @@ const MessageInput: FC<{receiverPhoto: string}> = ({ receiverPhoto }) => {
                         >
                             {!isSender && (
                                 <Avatar>
-                                    <AvatarImage src={apiBaseURL + receiverPhoto} className="object-cover" alt="Receiver Avatar" />
+                                    <AvatarImage src={receiverPhoto} className="object-cover" alt="Receiver Avatar" />
                                     <AvatarFallback>
                                         Receiver
                                     </AvatarFallback>

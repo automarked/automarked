@@ -4,10 +4,9 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { Notification } from '@/models/notification';
 import { createdInstance } from '../hooks/useApi';
 import io from 'socket.io-client';
-import { apiBaseURL } from '@/constants/api';
+import { FileAPIURL } from '@/constants/api';
 import useSound from '../hooks/useSound';
 import { toast } from '../hooks/use-toast';
-import { useSocketContext } from './SocketContext';
 
 interface NotificationContextData {
   notifications: Notification[];
@@ -23,7 +22,7 @@ interface NotificationContextData {
 const NotificationContext = createContext<NotificationContextData | null>(null);
 
 export const NotificationProvider: React.FC<{ userId: string; children: React.ReactNode }> = ({ userId, children }) => {
-  const { socket } = useSocketContext()
+  const [socket, setSocket] = useState<any | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
@@ -36,26 +35,30 @@ export const NotificationProvider: React.FC<{ userId: string; children: React.Re
   };
 
   useEffect(() => {
-    if (socket) {
-      socket.emit('joinNotificationRoom', { userId });
+    const socketInstance = io(FileAPIURL, { transports: ['websocket'] });
 
-      socket.on('newNotification', (newNotification: Notification[]) => {
-        playSound();
-        newNotification[0].type
-        showToast('Nova notificação!', '');
-        setUnreadNotifications(prev => [newNotification[newNotification.length - 1], ...prev])
-        setNotifications(() => newNotification);
-      });
+    socketInstance.emit('joinNotificationRoom', { userId });
+    setSocket(socketInstance);
 
-      socket.on('allNotificationsAsRead', () => setUnreadNotifications([]));
-  
-      socket.on('newMessage', async () => {
-        playSound();
-        showToast('Nova mensagem recebida!', '');
-        setUnreadMessagesCount((prev) => prev + 1);
-      });
-    }
-  }, [socket]);
+    socketInstance.on('newNotification', (newNotification: Notification[]) => {
+      playSound();
+      showToast('Nova notificação!', '');
+      setUnreadNotifications(prev => [newNotification[newNotification.length - 1], ...prev])
+      setNotifications(() => newNotification);
+    });
+
+    socketInstance.on('allNotificationsAsRead', () => setUnreadNotifications([]));
+
+    socketInstance.on('newMessage', async () => {
+      playSound();
+      showToast('Nova mensagem recebida!', '');
+      setUnreadMessagesCount((prev) => prev + 1);
+    });
+
+    return () => {
+      socketInstance.disconnect();
+    };
+  }, [userId]);
 
   const getUnreadMessagesCount = useCallback(async () => {
     const response = await createdInstance.get<{ totalUnreadMessages: number }>(`/chat/unread/${userId}`);

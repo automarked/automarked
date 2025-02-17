@@ -29,7 +29,6 @@ export default function CardDetail({ params }: { params: { id: string } }) {
     return (
         <>
             <CarViewer user={user} type="seller" onDelete={onDelete} vehicle={vehicle}/>
-            <div className="mt-24"></div>
         </>
     )
 }

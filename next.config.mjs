@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        domains: ['drive.google.com'], 
+        domains: ['localhost', 'auto-market-restfullapi-bdn6.onrender.com', 'drive.google.com'], 
     },
 };
 

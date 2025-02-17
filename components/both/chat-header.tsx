@@ -1,19 +1,24 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Menu } from "lucide-react";
 import { Chat } from "@/models/chatMessage";
 import Image from "next/image";
-import { apiBaseURL } from "@/constants/api";
 import { useMaterialLayout } from "@/contexts/LayoutContext";
 
 const ChatHeader: FC<Chat> = ({ chatWith }) => {
   const { toggleSidebar } = useMaterialLayout()
+
+  useEffect(() => {
+
+    console.log("CHAT WITH", chatWith);
+  }, [chatWith])
+  
   return (
     <header className="flex items-center justify-between px-4 py-2.5 bg-white shadow-md">
       {/* Avatar e informações */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white font-bold">
           <Image
-            src={apiBaseURL + chatWith.photo}
+            src={chatWith.photo}
             alt={chatWith.name}
             width={300}
             height={300}

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FaComment } from 'react-icons/fa';
 import { Vehicle } from '@/models/vehicle';
-import { apiBaseURL } from '@/constants/api';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -17,6 +16,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import useShoppingCart from '@/hooks/useShoppingCart';
 import { useUser } from '@/contexts/userContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import {
@@ -29,7 +29,21 @@ import {
     DrawerTitle,
     DrawerTrigger,
 } from "@/components/ui/drawer"
-import { Heart, MessageSquareText, ShoppingCart, Star, User, Wallet } from "lucide-react"
+import { Star, Wallet } from "lucide-react"
+// Dados Mockados
+const car = {
+    vehicleId: '1',
+    brand: 'Toyota',
+    model: 'Corolla',
+    description: 'Um carro confortável e confiável, perfeito para a cidade e viagens longas.',
+    price: '20,000',
+    gallery: ['/images/audi.png', '/images/carro-7.png', '/images/carro-6.png'],
+};
+
+const user = {
+    userId: '2',
+    type: 'customer', // Pode ser 'seller' ou 'customer'
+};
 
 import * as React from "react"
 
@@ -42,14 +56,8 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel"
 import { Button } from '../ui/button';
+import useWishlist from '@/hooks/useWishList';
 import { InventoryItem } from '@/models/inventory';
-import { useRouter } from 'next/navigation';
-import { useWishlist } from '@/contexts/WishListContext';
-import { useShoppingCart } from '@/contexts/ShoppingCartContext';
-import { formatCurrency } from '@/scripts/format-price';
-import { log } from 'console';
-import { Dialog, DialogContent } from '../ui/dialog';
-import { DialogTrigger } from '@radix-ui/react-dialog';
 
 export function CarouselSpacing() {
     return (
@@ -79,113 +87,48 @@ export function CarouselSpacing() {
 }
 
 
-const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user: { name: string, email: string, uid: string }, type: "costumer" | "seller" }> = ({
-    vehicle, user, type, onDelete
-}) => {
-    const { addVehicle, removeVehicle, getFromShoppingCart } = useShoppingCart()
-    const { addOnWishList, deleteFromWishList, getFrom } = useWishlist()
-    console.log(vehicle)
+const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user: { name: string, email: string, uid: string }, type: "costumer" | "seller" }> = ({ vehicle, user, type, onDelete }) => {
+    const { addVehicle } = useShoppingCart(user.uid)
+    const { actions } = useWishlist(user.uid)
     const { profile: chatWith } = useUser(vehicle.userId)
     const [isExpanded, setIsExpanded] = useState(false);
     const [image, setImage] = useState<string | null>(null);
-    const router = useRouter()
-    const [isInWishList, setIsInWishList] = useState(false)
-    const [isInShoppingCart, setIsInShoppingCart] = useState(false)
-
-    const checkVehicleInWishList = () => {
-        setIsInWishList(getFrom(vehicle.licensePlate))
-    }
-
-    const checkVehicleInShoppingCart = () => {
-        setIsInShoppingCart(getFromShoppingCart(vehicle.licensePlate))
-    }
-
-    useEffect(() => {
-        checkVehicleInWishList()
-        checkVehicleInShoppingCart()
-    }, [])
 
     const truncatedDescription = vehicle.description.length > 200
         ? vehicle.description.slice(0, 200) + '...'
         : vehicle.description;
 
-    const handleRemoveFromWishlist = useCallback(async () => {
-        setIsInWishList(false)
-        await deleteFromWishList(vehicle.vehicleId)
-    }, [vehicle]);
-
     const handleAddToWishlist = useCallback(async () => {
-        setIsInWishList(true)
-        await addOnWishList(vehicle)
-    }, [vehicle]);
+        await actions.addOnWishList(vehicle)
+    }, [vehicle, actions]);
 
     const handleAddToCart = useCallback(async () => {
-        setIsInShoppingCart(true)
         await addVehicle(vehicle)
-    }, [vehicle]);
-
-    const handleRemoveFromCart = useCallback(async () => {
-        setIsInShoppingCart(false)
-        await removeVehicle(vehicle.licensePlate)
-    }, [vehicle]);
+        console.log('Adicionado ao carrinho');
+    }, [vehicle, addVehicle]);
 
     return (
         <div className="flex flex-col items-center bg-white p-0 mb-32">
 
-
             {/* Car Image */}
-            <Dialog>
-                <DialogTrigger>
-                    <Image
-                        src={(image || vehicle.gallery[0])}
-                        alt={`Imagem do ${vehicle.brand} ${vehicle.model}`}
-                        width={500}
-                        height={300}
-                        className="w-full h-72 object-cover"
-                    />
-                </DialogTrigger>
-                <DialogContent className="w-full max-w-md rounded-none bg-white p-1 shadow-lg">
-                    <Image
-                        src={(image || vehicle.gallery[0])}
-                        alt={`Imagem do ${vehicle.brand} ${vehicle.model}`}
-                        width={500}
-                        height={300}
-                        className="w-full h-72 object-cover"
-                    />
-                </DialogContent>
-            </Dialog>
+            <Image
+                src={(image || vehicle.gallery[0])}
+                alt={`Imagem do ${vehicle.brand} ${vehicle.model}`}
+                width={500}
+                height={300}
+                className="w-full h-72 object-cover"
+            />
 
             {/* Car Details */}
             <div className="w-full max-w-2xl p-4">
-                <div className='flex justify-between items-center gap-8 mb-4'>
-                    <h1 className="text-2xl font-bold">
-                        {vehicle.brand} {vehicle.model}
-                    </h1>
-
-                    <div className='flex gap-4'>
-                        <button onClick={isInWishList ? handleRemoveFromWishlist : handleAddToWishlist} className="px-6 py-2 rounded-full border w-14 h-14">
-                            {isInWishList ? (
-                                <Heart fill='red' color='red' className='justify-self-center' />
-                            ) : (
-                                <Heart className='justify-self-center' />
-                            )}
-                        </button>
-
-                        <button onClick={isInShoppingCart ? handleRemoveFromCart : handleAddToCart} className="px-6 py-2 rounded-full border w-14 h-14">
-                            {isInShoppingCart ? (
-                                <ShoppingCart fill='orange' color='orange' className='justify-self-center' />
-                            ) : (
-                                <ShoppingCart className='justify-self-center' />
-                            )}
-                        </button>
-
-                    </div>
-                </div>
-                <div className="flex items-center gap-2 mb-4">
+                <h1 className="text-2xl font-bold mb-4">
+                    {vehicle.brand} {vehicle.model}
+                </h1>
+                {/* <div className="flex items-center gap-2 mb-4">
                     <span className="text-yellow-500">⭐⭐⭐⭐⭐</span>
                     <span className="text-gray-600">4.8 (86 avaliações)</span>
-                </div>
-                <div className="mb-4">
+                </div> */}
+                <div className="my-4">
                     <h2 className="text-xl font-semibold mb-2">Descrição</h2>
                     <p className='font-light'>
                         {isExpanded ? vehicle.description : truncatedDescription}
@@ -205,7 +148,7 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                     opts={{
                         align: "start",
                     }}
-                    className="w-full z-10"
+                    className="w-full max-w-sm z-10"
                 >
                     <CarouselContent>
                         {vehicle.gallery.map((galleryImage, index) => (
@@ -225,41 +168,32 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                 </Carousel>
                 <br />
 
-                {/* {chatWith?.photo && ( */}
-                <div onClick={() => {
-                    router.push(`/seller/chat/${chatWith?.userId}`)
-                }} className='flex items-center justify-between w-full bg-white shadow-md my-2 p-4 border-2 rounded-2xl'>
-                    <div className="flex gap-2 ">
-
-                        {chatWith?.photo ? (
+                {type === 'costumer' && chatWith?.photo && (
+                    <div className='flex items-center justify-between w-full'>
+                        <div className="flex items-start gap-2 mb-6">
                             <Image
                                 src={chatWith.photo}
                                 alt="Foto do vendedor"
                                 width={50}
                                 height={50}
-                                className="rounded-full object-cover h-12 w-12 border-2 border-black p-0.5"
+                                className="rounded-full"
                             />
-
-                        ) : (
-                            <div className="bg-slate-300 rounded-full h-12 w-12 border-2 border-gray-500 p-0.5 flex justify-center items-center text-slate-700">
-                                <User width={24} height={24} />
+                            <div>
+                                <p className="font-semibold">{chatWith.firstName} {chatWith.lastName}</p>
+                                <p className="text-gray-500">Conta Oficial</p>
                             </div>
-                        )}
-                        <div>
-                            <p className="font-semibold">{chatWith?.firstName} {chatWith?.lastName}</p>
-                            <p className="text-gray-500">Conta Oficial</p>
                         </div>
+                        <button>
+                            <FaComment size={24} />
+                        </button>
                     </div>
-                    <button>
-                        <MessageSquareText width={28} height={28} />
-                    </button>
-                </div>
-                {/* )} */}
+                )}
 
-                <div className=" mb-4 mt-4">
+                <div className=" mb-4">
                     <div className="flex justify-between">
                         <div className="flex items-center gap-2">
-                            <span className="text-xl font-bold text-gray-900">{formatCurrency(vehicle.price)}</span>
+                            <span className="font-semibold text-gray-700">AOA</span>
+                            <span className="text-xl font-bold text-gray-900">{vehicle.price},00</span>
                         </div>
                         <Drawer>
                             <DrawerTrigger>Mais detalhes</DrawerTrigger>
@@ -267,25 +201,18 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                                 <div className='px-6'>
                                     {chatWith && (
                                         <div className="flex items-center gap-4 mt-4">
-                                            {chatWith?.photo ? (
-                                                <Image
-                                                    src={chatWith?.photo}
-                                                    alt="Logo da loja"
-                                                    width={100}
-                                                    height={100}
-                                                    className="rounded-md"
-                                                />
-
-                                            ) : (
-                                                <div className="bg-slate-300 rounded-md p-2 flex justify-center items-center text-slate-700">
-                                                    <User width={24} height={24} />
-                                                </div>
-                                            )}
+                                            <Image
+                                                src={chatWith?.photo}
+                                                alt="Logo da loja"
+                                                width={50}
+                                                height={50}
+                                                className="rounded-md"
+                                            />
                                             <div className="space-y-1">
                                                 <p className="font-semibold">{chatWith.firstName + ' ' + chatWith.lastName}</p>
                                                 <div className="flex items-center gap-1">
                                                     <Star size={16} className="text-yellow-500" />
-                                                    <p className="text-sm text-gray-500">5.0 - 14 reviews</p>
+                                                    <p className="text-sm text-gray-500">{chatWith.phone ?? ''}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -294,30 +221,6 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                                     {/* Especificações */}
                                     <h3 className="mt-6 text-lg font-bold">Especificações</h3>
                                     <div className="grid grid-cols-2 gap-4 mt-2">
-                                        <div className="space-y-1 border flex flex-col items-center py-2 rounded-md">
-                                            <p className="text-sm font-semibold">Marca</p>
-                                            <p className="text-sm text-gray-500">{vehicle.brand}</p>
-                                        </div>
-                                        <div className="space-y-1 border flex flex-col items-center py-2 rounded-md">
-                                            <p className="text-sm font-semibold">Modelo</p>
-                                            <p className="text-sm text-gray-500">{vehicle.model}</p>
-                                        </div>
-                                        <div className="space-y-1 border flex flex-col items-center py-2 rounded-md">
-                                            <p className="text-sm font-semibold">Cor</p>
-                                            <p className="text-sm text-gray-500">{vehicle.color}</p>
-                                        </div>
-                                        <div className="space-y-1 border flex flex-col items-center py-2 rounded-md">
-                                            <p className="text-sm font-semibold">Condição</p>
-                                            <p className="text-sm text-gray-500">{vehicle.condition}</p>
-                                        </div>
-                                        <div className="space-y-1 border flex flex-col items-center py-2 rounded-md">
-                                            <p className="text-sm font-semibold">Quilometragem</p>
-                                            <p className="text-sm text-gray-500">{vehicle.mileage}</p>
-                                        </div>
-                                        <div className="space-y-1 border flex flex-col items-center py-2 rounded-md">
-                                            <p className="text-sm font-semibold">Matrícula</p>
-                                            <p className="text-sm text-gray-500">{vehicle.licensePlate}</p>
-                                        </div>
                                         {vehicle.specifications.map((spec, index) => (
                                             <div key={index} className="space-y-1 border flex flex-col items-center py-2 rounded-md">
                                                 <p className="text-sm font-semibold">{spec.label}</p>
@@ -329,23 +232,14 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                                     {/* Price and Action */}
                                     <div className="flex items-center justify-between mt-6">
                                         <div className="flex items-center gap-2">
-                                            <p className="text-xl font-bold">{formatCurrency(vehicle.price)}</p>
-                                        </div>
-
-                                        <Button
-                                            className="w-[40%] max-w-md py-6 mb-6 bg-black text-white rounded-full text-lg font-medium"
-                                            onClick={() => {
-                                                router.push("/seller/shopping-cart/" + vehicle.licensePlate);
-                                            }}
-                                        >
-                                            Comprar
-                                            <Wallet size={20} />
-                                        </Button>
+                                            <span className="px-1 py-0.5 text-xs font-bold bg-gray-100">AOA</span>
+                                            <p className="text-xl font-bold">{vehicle.price},00</p>
+                                        </div>                                        
                                     </div>
                                 </div>
                                 <DrawerFooter>
                                     <DrawerClose className='w-full'>
-                                        <Button variant="outline" className="w-full max-w-md py-6 mb-6 bg-black text-white rounded-full text-lg font-medium">Fechar detalhes</Button>
+                                        <Button variant="outline" className='w-full'>Fechar detalhes</Button>
                                     </DrawerClose>
                                 </DrawerFooter>
                                 <br />
@@ -353,12 +247,62 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                         </Drawer>
                     </div>
                     <br />
-
+                    {type === "costumer" && (
+                        <AlertDialog>
+                            <AlertDialogTrigger className="px-6 py-2 bg-blue-500 text-white w-full rounded">Adicionar a lista de desejos</AlertDialogTrigger>
+                            <AlertDialogContent className='max-w-[90%] rounded-md'>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Deseja adicionar <strong>{vehicle.brand} {vehicle.model} </strong>a lista de desejos?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Esta operação pode ser desfeita ao eliminar o veículo de sua lista
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancele</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleAddToWishlist}>Adicione</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    )}
                 </div>
 
+                {type === 'costumer' && (
+                    <AlertDialog>
+                        <AlertDialogTrigger className="w-full py-2 bg-green-500 text-white rounded mt-4">Adicionar no carrinho</AlertDialogTrigger>
+                        <AlertDialogContent className='max-w-[90%] rounded-md'>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Deseja adicionar <strong>{vehicle.brand} {vehicle.model} </strong>ao seu carrinho de compras?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Esta operação pode ser desfeita ao eliminar o veículo de sua lista
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancele</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleAddToCart}>Adicione</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                )}
 
-
-
+                {type === 'seller' && onDelete && (
+                    <AlertDialog>
+                        <AlertDialogTrigger>
+                            <Button onClick={() => onDelete(vehicle)}>Eliminar do inventário</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className='max-w-[90%] rounded-md'>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Deseja adicionar <strong>{vehicle.brand} {vehicle.model} </strong>ao seu carrinho de compras?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Esta operação pode ser desfeita ao eliminar o veículo de sua lista
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancele</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleAddToCart}>Adicione</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                )}
             </div>
         </div>
     );

@@ -5,3 +5,4 @@ export interface InventoryItem {
     quantity: number;          
     entryDate: Date;
 }
+      

@@ -1,14 +1,18 @@
-import { apiBaseURL } from "@/constants/api";
 import { Chat } from "@/models/chatMessage";
 import { formatRelativeDate } from "@/scripts/relative-date";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export const ChatList: React.FC<{ chats: Chat[], userId: string }> = ({ chats, userId }) => {
     const router = useRouter();
     const handleChatClick = (chatId: string) => {
         router.push(`/seller/chat/${chatId}`);
     };
+    useEffect(() => {
+        console.log(chats);
+        
+    }, [chats])
     return (
         <div className="flex md:hidden flex-col w-full gap-4">
             {chats.length > 0 && chats.map((chat, index) => (
@@ -18,9 +22,11 @@ export const ChatList: React.FC<{ chats: Chat[], userId: string }> = ({ chats, u
                     className="flex w-full items-center justify-between p-4 bg-white border-b border-gray-200 rounded-md shadow-sm"
                 >
                     <div className="flex items-center">
-                        <img
-                            src={apiBaseURL + chat.chatWith.photo}
+                        <Image
+                            src={chat.chatWith.photo}
                             alt={chat.chatWith.name}
+                            width={50}
+                            height={50}
                             className="w-12 h-12 rounded-full mr-4"
                         />
                         <div className="flex-1 text-start">

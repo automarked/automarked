@@ -1,16 +1,16 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import io, { Socket } from 'socket.io-client';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { createdInstance } from '../hooks/useApi';
-import { apiBaseURL } from '@/constants/api';
+import { FileAPIURL } from '@/constants/api';
 import { Chat } from '@/models/chatMessage';
 
 export interface User {
     _id: string | number;
     name?: string;
     avatar?: string;
-}
+} 
 
-export interface Reply {
+export interface Reply {    
     title: string;
     value: string;
     messageId?: number | string;
@@ -49,7 +49,7 @@ export const ChatProvider: React.FC<{ senderId: string, children: React.ReactNod
     // Carrega as mensagens ou os chats do usuário
     const getAllMessagesOrChats = useCallback(async () => {
         if (receiverId) {
-            // Carregar mensagens entre o `senderId` e o `receiverId`
+            // Carregar mensagens entre o `senderId` e o `receiverId`      
             const response = await createdInstance.get<{ messages: IMessage[] }>(
                 `/chat/messages?senderId=${senderId}&receiverId=${receiverId}`
             );
@@ -60,7 +60,7 @@ export const ChatProvider: React.FC<{ senderId: string, children: React.ReactNod
             // Carregar todos os chats do `senderId`
             const response = await createdInstance.get<{ chats: Chat[] }>(
                 `/chat/user-chats?userId=${senderId}`
-            );
+            );    
 
             if (response.status === 200) {
                 setChats(response.data.chats);
@@ -83,7 +83,7 @@ export const ChatProvider: React.FC<{ senderId: string, children: React.ReactNod
     // Conectar ao Socket.IO e inicializar os dados
     useEffect(() => {
         getAllMessagesOrChats();
-        const socketInstance = io(apiBaseURL, {
+        const socketInstance = io(FileAPIURL, {
             transports: ['websocket'], // Evitar problemas com transporte no React Native
         });
         setSocket(socketInstance);

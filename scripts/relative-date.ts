@@ -1,10 +1,24 @@
-import { format, isToday, isYesterday, differenceInDays } from 'date-fns';
-import { toZonedTime } from 'date-fns-tz';
+import { format, isToday, isYesterday, differenceInDays, differenceInMinutes } from 'date-fns';
 
 export function formatRelativeDate(date: string): string {
-  const timeZone = 'America/Sao_Paulo'; // Substitua pelo fuso horário desejado
-  const parsedDate = toZonedTime(new Date(date), timeZone); // Converte UTC para o fuso desejado
-  const now = toZonedTime(new Date(), timeZone); // Também ajusta o "agora" para o mesmo fuso
+  const parsedDate = new Date(date);
+  const now = new Date();
+
+  // Calcula a diferença em minutos
+  const minutesDiff = differenceInMinutes(now, parsedDate);
+
+  if (minutesDiff < 60) {
+
+    if(minutesDiff === 0) {
+      return `Agora`
+    }
+
+    if(minutesDiff === 1) {
+      return `Há 1 minuto`
+    }
+    
+    return `Há ${minutesDiff} minutos`;
+  }
 
   if (isToday(parsedDate)) {
     return `Hoje às ${format(parsedDate, 'HH:mm')}`;

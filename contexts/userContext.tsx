@@ -2,11 +2,12 @@
 
 import { createdInstance } from '@/hooks/useApi';
 import { IUser } from '@/models/user';
-import { secureGet, secureStore } from '@/secure/sessions';
+import { setCookie, getCookie, removeCookie } from '@/secure/cookies'
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { FileAPIURL } from '@/constants/api';
 import useImage from '@/hooks/useImage';
 import { toast } from '@/hooks/use-toast';
-import { getCookie, removeCookie, setCookie } from '@/secure/cookies';
+import { log } from 'console';
 
 // Tipo do usuário conforme especificado
 // Tipo do contexto
@@ -29,16 +30,15 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (storedUser) {
       setUser(storedUser)
     }
-  }, []);
+  }, [])
 
-  // Atualizar localStorage sempre que o usuário mudar
   useEffect(() => {
     if (user) {
       setCookie('user', user)
     } else {
       removeCookie('user')
     }
-  }, [user]);
+  }, [user])
 
   // Função de logout
   const logout = () => {
@@ -58,30 +58,21 @@ export const useUser = (userId?: string): UserContextType & {
   setProfile: React.Dispatch<React.SetStateAction<IUser | undefined>>
   imageURL: string,
   handleProfileChange: (field: keyof IUser, value: string) => void
-  handleUpdateProfile: () => Promise<void>
+  handleUpdateProfile: (bg?: string) => Promise<void>
   selectImage: () => void
   activeImagePreview: boolean
-  handleDiscardImage: () => void
+  handleDiscardImage: (index: number) => void
   getCollaborators: () => void
   collaborators: IUser[]
-  getUsersByProfileType: (param: "costumer" | "seller" | "collaborator") => void
-  stores: IUser[]
-  isLoadingStores: boolean
-  isLoadingUpdate: boolean,
-  getUser:  (id: string) => Promise<IUser | undefined>
 } => {
   const context = useContext(UserContext);
   const [collaborators, setCollaborators] = useState<IUser[]>([])
   const [profile, setProfile] = useState<IUser>()
   const [imageURL, setImageURL] = useState<string>('/images/logo.png')
-  const { image, actions } = useImage();
+  const { images, actions } = useImage();
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(false)
   const [activeImagePreview, setActiveImagePreview] = useState(false)
-  const [stores, setStore] = useState<IUser[]>([])
-  const [isLoadingCollaborators, setIsLoadingCollaborators] = useState(false)
-  const [isLoadingStores, setIsLoadingStores] = useState(false)
-  const [isLoadingUpdate, setIsLoadingUpdate] = useState(false)
   const showToast = (title: string, description: string) => {
     toast({
       title,
@@ -90,75 +81,59 @@ export const useUser = (userId?: string): UserContextType & {
   };
 
   useEffect(() => {
-    setImageURL((profile?.photo ?? '/images/logo.png'));
+    if (profile?.photo) {
+      setImageURL(profile?.photo);
+    }
+    else setImageURL('/images/logo.png')
   }, [profile])
 
 
   useEffect(() => {
-    if (image) {
-      const previewURL = URL.createObjectURL(image);
+    if (images.length > 0) {
+      const previewURL = URL.createObjectURL(images[0]);
       setImageURL(previewURL);
       setActiveImagePreview(true);
     } else if (!activeImagePreview && profile?.photo) {
       // Só redefine o `imageURL` se o preview não estiver ativo
       setImageURL(profile.photo);
     }
-  }, [image, profile, activeImagePreview]);
+  }, [images, profile, activeImagePreview]);
 
-  const handleDiscardImage = () => actions.discard()
+  const handleDiscardImage = (index: number) => actions.discard(index)
 
   const getProfile = useCallback(
     async (refetch: boolean = true) => {
       if (!userId && !refetch) {
-        // Verificar se há cache disponível
-        const haveProfileCache = getCookie('secure-profile')
-        if (haveProfileCache && typeof haveProfileCache === "object") {
-          setProfile(haveProfileCache);
-          return haveProfileCache;
+        
+        const profileCache = getCookie('secure-profile')
+        if (profileCache && typeof profileCache === 'object') {
+          setProfile(profileCache)
+          return profileCache
         }
-        return undefined; // Caso não haja cache, retornar undefined
+        return undefined
       }
 
       if (userId && createdInstance) {
         try {
           const response = await createdInstance.get<{ message: string | null; record: IUser }>(
             `/users/${userId}`
-          );
+          )
 
-          if (response.status === 200) {
+          if (response.status === 200) {            
             setCookie('profile-type', response.data.record.type)
             setCookie('secure-profile', response.data.record)
-            setProfile(response.data.record);
-            return response.data.record;
+            setProfile(response.data.record)
+            return response.data.record
           } else {
-            throw new Error(`Erro ao buscar perfil: ${response.status}`);
+            throw new Error(`Erro ao buscar perfil: ${response.status}`)
           }
         } catch (error) {
-          console.error(error);
+          console.error(error)
         }
       }
     },
     [userId]
-  );
-
-  const getUser = useCallback(
-    async (id: string) => {
-      try {
-        const response = await createdInstance.get<{ message: string | null; record: IUser }>(
-          `/users/${id}`
-        );
-
-        if (response.status === 200) {
-          return response.data.record;
-        } else {
-          throw new Error(`Erro ao buscar perfil: ${response.status}`);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    []
-  );
+  )
 
   const getCollaborators = useCallback(async () => {
     const collaborators = await createdInstance.get<{ message?: string, record: IUser[] }>(`/users/collaborators/${userId}`)
@@ -168,34 +143,34 @@ export const useUser = (userId?: string): UserContextType & {
     }
   }, [])
 
-  const handleUpdateProfile = useCallback(async () => {
+  const handleUpdateProfile = useCallback(async (bg?: string) => {
     if (!profile) return;
-    setIsLoadingUpdate(true);
+    setIsLoading(true);
 
     const formData = new FormData();
     formData.append("firstName", profile.firstName);
     formData.append("lastName", profile.lastName);
+    formData.append("birthDate", String(profile.birthDate));
     formData.append("municipality", profile.municipality);
     formData.append("province", profile.province);
     formData.append("description", profile.description);
-    formData.append("birthDate", String(profile.birthDate));
     formData.append("phone", profile.phone);
     formData.append("gender", profile.gender);
     formData.append("userId", userId ?? "");
+    if (bg || profile.background)
+      formData.append("background", bg ?? '')
 
-    if (image) {
-      const myImageConvertedToBlobFile = await actions.blob();
+    if (images.length > 0) {
+      const myImageConvertedToBlobFile = await actions.blobs();
       if (!myImageConvertedToBlobFile) return;
 
-      const typeFile = myImageConvertedToBlobFile.type.split("/")[1];
-
-      formData.append("file", image)
+      formData.append("file", images[0])
     }
 
-    const result = await handleUpdate(formData);
+    await handleUpdate(formData);
 
-    setIsLoadingUpdate(false);
-  }, [profile, image, actions, userId]);
+    setIsLoading(false);
+  }, [profile, images, actions, userId]);
 
   const handleUpdate = useCallback(async (data: FormData) => {
     try {
@@ -230,15 +205,6 @@ export const useUser = (userId?: string): UserContextType & {
     []
   );
 
-  const getUsersByProfileType = useCallback(async (profileType: "seller" | "costumer" | "collaborator") => {
-    setIsLoadingStores(true)
-    const response = await createdInstance.get<{ message: null, record: IUser[] }>(`/users/by-type/${profileType}`, { params: { type: profileType } })
-    if (response.status === 200) {
-      setStore(response.data.record)
-    }
-    setIsLoadingStores(false)
-  }, [])
-
 
   useEffect(() => {
     if (userId) getProfile()
@@ -249,19 +215,14 @@ export const useUser = (userId?: string): UserContextType & {
   return {
     ...context,
     profile,
-    isLoadingUpdate,
-    isLoadingStores,
     getCollaborators,
     collaborators,
     setProfile,
     imageURL,
     handleUpdateProfile,
     handleProfileChange,
-    selectImage: actions.selectImage,
+    selectImage: actions.selectImages,
     activeImagePreview,
-    handleDiscardImage,
-    getUsersByProfileType,
-    stores,
-    getUser
+    handleDiscardImage
   };
 };

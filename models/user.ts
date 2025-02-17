@@ -8,7 +8,7 @@ export interface ICompany {
   bankName: string
   IBAN: string
   companyId: string
-  background?: string
+  background?: string 
 }
 
 export type IUser = Partial<ICompany> & {
@@ -20,6 +20,7 @@ export type IUser = Partial<ICompany> & {
   gender: string;
   phone: string;
   photo: string;
+  password: string;
   description: string;
   municipality: string;
   province: string;

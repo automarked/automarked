@@ -10,6 +10,9 @@ import { z } from 'zod';
 import { createdInstance } from '@/hooks/useApi';
 import { toast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { ChevronLeft } from 'lucide-react';
+import GoBack from '@/components/goBack';
 
 const customerSchema = z.object({
     firstName: z.string().nonempty("O primeiro nome é obrigatório"),
@@ -107,7 +110,7 @@ const RegisterForm = () => {
             if (user.status === 201) {
                 showToast("Successo!", `Sua conta de (Vendedor) Concessionário da Automarket foi criada com successo! Você será redirecionado para fazer o login!`)
                 setTimeout(() => {
-                    router.push("https://auto-mnext-jirk.vercel.app/login-with-credentials")
+                    router.push("/login-with-credentials")
                 }, 5000);
             } else {
                 showToast("Ocorreu algum erro inesperado!", user.data.message)
@@ -117,6 +120,9 @@ const RegisterForm = () => {
 
     return (
         <div className="flex pb-20 pt-20 flex-col items-center max-w-md mx-auto w-full justify-center min-h-screen bg-white px-6">
+
+           <GoBack className='' />
+
             {/* Logo */}
             <div className="mb-6">
                 <Image
@@ -190,12 +196,13 @@ const RegisterForm = () => {
 
                         <div className="w-full">
                             <Label htmlFor="birthDate">Data de Nascimento</Label>
-                            <Input
-                                className='mobile-input'
-                                id="birthDate"
+                            <input
                                 type="date"
+                                id="birthDate"
                                 value={formData.birthDate}
                                 onChange={(e) => handleChange('birthDate', e.target.value)}
+                                className="p-0 w-full m-0 rounded-md shadow-sm border-none outline-none py-[14px] px-[16px] outline-offset-0"
+                                placeholder="Data de nascimento"
                             />
                             {errors.birthDate && <p className="text-red-500">{errors.birthDate}</p>}
 

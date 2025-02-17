@@ -13,16 +13,7 @@ import { BsChatLeftText } from "react-icons/bs";
 import { IMessage, useChatContext } from "@/contexts/chatContext";
 import { Textarea } from "@/components/ui/textarea";
 import moment from "moment-timezone";
-
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
+import GoBack from "@/components/goBack";
 
 interface ChatScreenProps {
     sender: IUser;
@@ -92,17 +83,6 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ sender, receiver }) => {
 
     const [isAditActive, setIsAditActive] = useState<boolean>(false);
 
-    const handleDisplayAditOption = (createdAt: Date | number) => {
-        const fullDateSent = new Date(createdAt);
-        const currentFullDate = new Date(getCurrentTime());
-
-        if ((fullDateSent.getHours() === currentFullDate.getHours()) && (fullDateSent.getMinutes() + 5 > currentFullDate.getMinutes())) {
-            setIsAditActive(true);
-        } else {
-            setIsAditActive(false);
-        }
-    }
-
     return (
         <>
             <div className="flex flex-col h-screen overflow-y-scroll bg-white">
@@ -123,16 +103,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ sender, receiver }) => {
                         </div>
                     </div>
                     <div className="flex items-center space-x-4">
-                        <div className="relative cursor-pointer" onClick={() => {
-                            router.push('/seller/chat');
-                        }}>
-                            <BsChatLeftText size={22} fontWeight={800} />
-                            {unreadMessagesCountContext > 0 && (
-                                <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                                    {unreadMessagesCountContext}
-                                </div>
-                            )}
-                        </div>
+                        <GoBack className='relative mt-[-15px]' />
                         <div className="relative cursor-pointer" onClick={() => {
                             router.push('/seller/notifications');
                         }}>

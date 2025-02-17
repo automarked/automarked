@@ -13,9 +13,7 @@ import { useRouter } from 'next/navigation';
 
 const customerSchema = z.object({
     firstName: z.string().nonempty("O primeiro nome é obrigatório"),
-    lastName: z.string().nonempty("O município é obrigatório"),
-    municipality: z.string().nonempty("O último nome é obrigatório"),
-    province: z.string().nonempty("A província é obrigatória"),
+    lastName: z.string().nonempty("O último nome é obrigatório"),
     email: z.string().email("E-mail inválido"),
     phone: z.string().nonempty("O telefone é obrigatório"),
     birthDate: z.string().nonempty("A data de nascimento é obrigatória"),
@@ -48,8 +46,6 @@ const RegisterForm = () => {
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
-        municipality: '',
-        province: '',
         email: '',
         phone: '',
         birthDate: '',
@@ -108,7 +104,7 @@ const RegisterForm = () => {
             if (user.status === 201) {
                 showToast("Successo!", `Sua conta de ${type === 'customer' ? 'Cliente' : '(Vendedor) Concessionário'} da Automarket foi criada com successo! Você será redirecionado para fazer o login!`)
                 setTimeout(() => {
-                    router.push('/login-with-credentials')
+                    router.push('https://auto-mn-client.vercel.app/login-with-credentials')
                 }, 5000);
             } else {
                 showToast("Ocorreu algum erro inesperado!", user.data.message)
@@ -117,7 +113,7 @@ const RegisterForm = () => {
     }, [formData])
 
     return (
-        <div className="flex pb-20 pt-20 flex-col items-center max-w-md mx-auto w-full justify-center min-h-screen bg-white px-6">
+        <div className="flex pb-20 pt-20 flex-col items-center max-w-md mx-auto w-full justify-center min-h-screen bg-transparent px-6">
             {/* Logo */}
             <div className="mb-6">
                 <Image
@@ -161,30 +157,6 @@ const RegisterForm = () => {
                 </div>
 
                 <div className="w-full">
-                    <Label htmlFor="municipality">Município</Label>
-                    <Input
-                        className='mobile-input'
-                        id="municipality"
-                        placeholder="Digite seu município"
-                        value={formData.municipality}
-                        onChange={(e) => handleChange('municipality', e.target.value)}
-                    />
-                    {errors.municipality && <p className="text-red-500">{errors.municipality}</p>}
-                </div>
-
-                <div className="w-full">
-                    <Label htmlFor="province">Província</Label>
-                    <Input
-                        className='mobile-input'
-                        id="province"
-                        placeholder="Digite sua província"
-                        value={formData.province}
-                        onChange={(e) => handleChange('province', e.target.value)}
-                    />
-                    {errors.province && <p className="text-red-500">{errors.province}</p>}
-                </div>
-
-                <div className="w-full">
                     <Label htmlFor="email">E-mail</Label>
                     <Input
                         className='mobile-input'
@@ -222,7 +194,7 @@ const RegisterForm = () => {
                     />
                     {errors.birthDate && <p className="text-red-500">{errors.birthDate}</p>}
 
-                </div>      
+                </div>
 
                 <div className="w-full">
                     <Label htmlFor="password">Senha</Label>

@@ -2,62 +2,90 @@ import { useCallback, useState } from "react";
 import { createdInstance } from "./useApi";
 
 export default function useImage() {
-  const [image, setImage] = useState<File | null>(null);
+  const [images, setImages] = useState<File[]>([]); // Agora gerencia várias imagens
+  const [loading, setLoading] = useState(false)
 
-  const discard = () => {
-    setImage(null)
-  }
+  // Limitar o número máximo de imagens
+  const MAX_IMAGES = 9;
 
-  const blob = useCallback(async (): Promise<Blob | undefined> => {
-    if (!image) return;
+  // Método para descartar uma imagem específica
+  const discard = (index: number) => {
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+  };
+
+  // Converter todas as imagens para blobs (opcional)
+  const blobs = useCallback(async (): Promise<Blob[] | undefined> => {
+    if (images.length === 0) return
 
     try {
-      return image;
+      return images.map((image) => image);
     } catch (error) {
-      console.error("Erro ao converter a imagem para Blob:", error);
+      console.error("Erro ao converter as imagens para Blob:", error);
     }
-  }, [image]);
+  }, [images]);
 
-  const save = useCallback(async (): Promise<string | undefined> => {
-    if (!image || !createdInstance) return;
+  // Salvar todas as imagens no servidor
+  const saveAll = useCallback(async (): Promise<string[] | undefined> => {
+    if (images.length === 0 || !createdInstance) return;
 
+    setLoading(true)
     try {
-      const formData = new FormData();
-      formData.append("file", image, image.name);
+      const urls: string[] = [];
+      console.log("enviando...");
 
-      const response = await createdInstance.post<{ message: string; record?: { photoURL: string } }>(
-        "/file-upload-one",
-        formData
-      );
+      for (const image of images) {
+        const formData = new FormData();
+        formData.append("file", image, image.name);
+        console.log("requisição...");
 
-      if (response.status === 200) {
-        console.log(response.data);
-        return response.data.record?.photoURL;
+        const response = await createdInstance.post<{ message: string; fileId: string, fileName: string, webViewLink: string }>(
+          "/upload",
+          formData
+        );
+
+        console.log(response);
+
+        if (response.status === 200 && response.data.webViewLink) {
+          urls.push(response.data.webViewLink);
+        }
       }
-    } catch (error) {
-      console.error("Erro ao enviar a imagem:", error);
-    }
-  }, [image]);
 
-  const selectImage = useCallback(() => {
+      return urls;
+    } catch (error) {
+      console.error("Erro ao enviar as imagens:", error);
+    } finally {
+      setLoading(false)
+    }
+  }, [images]);
+
+  // Selecionar múltiplas imagens
+  const selectImages = useCallback(() => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
+    input.multiple = true; // Permitir seleção múltipla
     input.onchange = (event: Event) => {
       const target = event.target as HTMLInputElement;
-      if (target.files && target.files.length > 0) {
-        setImage(target.files[0]);
+      if (target.files) {
+        const selectedFiles = Array.from(target.files);
+
+        // Garantir que o número máximo de imagens seja respeitado
+        setImages((prevImages) => {
+          const newImages = [...prevImages, ...selectedFiles];
+          return newImages.slice(0, MAX_IMAGES); // Cortar se exceder o limite
+        });
       }
     };
     input.click();
   }, []);
 
   return {
-    image,
+    images, // Todas as imagens selecionadas
+    loading,
     actions: {
-      save,
-      blob,
-      selectImage,
+      saveAll,
+      blobs,
+      selectImages,
       discard
     },
   };

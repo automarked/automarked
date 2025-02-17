@@ -10,74 +10,122 @@ import useVehicle from '@/hooks/useVehicle';
 import { Brand } from '@/models/brand';
 import { useCallback, useState } from 'react';
 import React, { useEffect } from "react";
-import { cn } from "@/lib/utils"; // Função utilitária para classes condicionais, caso necessário
-import { ImageIcon, PencilIcon } from "lucide-react"; // Ícones compatíveis com ShadCN
+import { cn } from "@/lib/utils";
+import { ImageIcon, PencilIcon } from "lucide-react";
 import useImage from '@/hooks/useImage';
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser } from '@/contexts/userContext';
-import Stepper from '@/components/both/steper';
 import { toast } from '@/hooks/use-toast';
+import useInventory from '@/hooks/useInventory';
+import { Colors } from '@/constants/colors';
+import Image from 'next/image';
+import Loader from '@/components/loader';
 
 type GalleryItemProps = {
-  add: (imageUrl: string) => void
+  add: (imageUrl: string[]) => void;
+  remove: (index: number) => void;
+  actions: {
+    saveAll: () => Promise<string[] | undefined>;
+    blobs: () => Promise<Blob[] | undefined>;
+    selectImages: () => void;
+    discard: (index: number) => void;
+  },
+  images: File[],
+  loading: boolean
 };
 
-const GalleryItem: React.FC<GalleryItemProps> = ({ add }) => {
-  const { actions, image } = useImage();
-  const [previewImage, setPreviewImage] = useState<string | null>(null); // URL de pré-visualização
+const GalleryItem: React.FC<GalleryItemProps> = ({ add, remove, actions, images, loading }) => {
 
-  // Gerar pré-visualização da imagem selecionada
+  const [previewImages, setPreviewImages] = useState<(string | null)[]>([]);
+  const [error, setError] = useState<undefined | string>()
+
   useEffect(() => {
-    if (image) {
-      const previewURL = URL.createObjectURL(image);
-      setPreviewImage(previewURL);
-
-      return () => {
-        URL.revokeObjectURL(previewURL); // Limpa a memória quando o componente desmonta ou a URL muda
-      };
-    }
-  }, [image]);
-
-  // Salvar e adicionar a imagem
-  useEffect(() => {
-    const saveImage = async () => {
+    const previews = images.map((image) => {
       if (image) {
-        const photoURL = await actions.save();
-        if (photoURL) {
-          add(photoURL);
-        }
+        return URL.createObjectURL(image);
       }
-    };
+      return null;
+    });
 
-    saveImage();
-  }, [image]);
+    setPreviewImages(previews);
+
+    return () => {
+      previews.forEach((url) => {
+        if (url) URL.revokeObjectURL(url);
+      });
+    };
+  }, [images]);
+
+  const saveAllImages = async () => {
+    if (images.length < 4) {
+      console.log(images)
+      setError("Carregue 4 imagens!")
+      setTimeout(() => {
+        setError(undefined)
+      }, 5000);
+    } else {
+      const photoURLs = await actions.saveAll();
+      if (photoURLs) {
+        add(photoURLs)
+      }
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    actions.discard(index);
+    remove(index)
+  };
 
   return (
-    <div className="relative border border-gray-200 rounded-md overflow-hidden aspect-square flex items-center justify-center">
-      {previewImage ? (
-        <img
-          src={previewImage}
-          alt="Selecionada"
-          className="w-full h-full object-cover"
-        />
-      ) : (
-        <div className="flex flex-col items-center justify-center text-gray-500">
-          <ImageIcon className="h-8 w-8" />
-          {/* <p className="text-sm text-center">Selecione uma imagem</p> */}
-        </div>
-      )}
-      <Button
-        variant="ghost"
-        className={cn(
-          "absolute top-2 right-2 p-2 rounded-full bg-white shadow",
-          "hover:bg-gray-100 transition"
+    <div>
+      <div className="grid grid-cols-3 gap-2">
+        {previewImages.map((preview, index) => (
+          <div
+            key={index}
+            className="relative border border-gray-200 rounded-md overflow-hidden aspect-square flex items-center justify-center"
+          >
+            {preview ? (
+              <Image
+                width={100}
+                height={100}
+                src={preview}
+                alt={`Imagem ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center text-gray-500">
+                <ImageIcon className="h-8 w-8" />
+              </div>
+            )}
+            <div
+              className={cn(
+                "absolute cursor-pointer bottom-2 right-2 p-2 rounded-full bg-white shadow",
+                "hover:bg-gray-100 transition"
+              )}
+              onClick={() => handleRemoveImage(index)}
+            >
+              Remover
+            </div>
+          </div>
+        ))}
+        {previewImages.length < 15 && (
+          <div
+            className="relative border border-gray-200 rounded-md overflow-hidden aspect-square flex items-center justify-center cursor-pointer"
+            onClick={() => actions.selectImages()}
+          >
+            <div className="flex flex-col items-center justify-center text-gray-500">
+              <PencilIcon className="h-8 w-8" />
+              <p className="text-sm text-center">Adicionar Imagem</p>
+            </div>
+          </div>
         )}
-        onClick={actions.selectImage}
-      >
-        <PencilIcon className="h-5 w-5 text-gray-700" />
-      </Button>
+      </div>
+
+      <div>
+        {error && <span className='text-red-600'>{error}</span>}
+      </div>
     </div>
   );
 };
@@ -108,24 +156,31 @@ const vehicleSchema = z.object({
   bar_code: z.string({ message: "Digite o código de barras." }),
   internal_code: z.string({ message: "Digite o código interno." }),
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
-  gallery: z.array(z.string()).min(9, "Adicione 9 imagens à galeria."), // Garante que a galeria tenha no mínimo 9 imagens
-  specifications: z.array(
-    z.object({
-      label: z.string(),
-      description: z.string(),
-    })
-  ).optional(),
+  gallery: z.array(z.string()).min(4, "Adicione no mínimo 4 imagens à galeria. Salve as imagens antes de cadastrar."), // Garante que a galeria tenha no mínimo 4 imagens
+  fuel: z.enum(["Gasolina", "Diesel", "Elétrico", "Híbrido"], { message: "Selecione o tipo de combustível." }),
+  transmission: z.enum(["Manual", "Automática", "CVT"], { message: "Selecione o tipo de transmissão." }),
+  enginePower: z
+    .string()
+    .regex(/^\d+$/, "Potência do motor deve ser um número inteiro.")
+    .refine((value) => parseInt(value, 10) > 0, "Potência do motor deve ser maior que 0."),
+  location: z.string().min(3, "Informe uma localização válida."),
 });
 
 type VehicleFormData = z.infer<typeof vehicleSchema>;
 
 const VehicleForm = () => {
+  const useImageValues = useImage();
   const { user } = useUser()
   const { profile } = useUser(user?.uid ?? '')
-  const { vehicle: vehicleData, actions } = useVehicle();
+  const { vehicle: vehicleData } = useVehicle();
+  const { addVehicle } = useInventory(user?.uid ?? '')
   const { brandsList } = useBrands();
   const [brand, setBrand] = useState<Brand>();
-  const [currentSection, setCurrentSection] = useState(0); // Estado para controlar a seção atual
+  const [currentSection, setCurrentSection] = useState(0);
+  const [changesOnLicence, setChangesOnLicence] = useState('')
+  const [error, setError] = useState<undefined | string>()
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const {
     control,
     handleSubmit,
@@ -137,42 +192,124 @@ const VehicleForm = () => {
     resolver: zodResolver(vehicleSchema),
     defaultValues: {
       ...vehicleData,
-      specifications: [
-
-      ],
       gallery: vehicleData.gallery,
     },
   });
 
-  const addImageToGallery = (imageUrl: string) => {
-    const currentGallery = getValues('gallery');
-    setValue('gallery', [...currentGallery, imageUrl]);
+  useEffect(() => {
+    document.querySelectorAll('input').forEach((input) => {
+      input.setAttribute('autocomplete', 'off');
+    });
+  }, []);
+
+  const formatLicensePlate = (value: string) => {
+    const cleanValue = value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+    return cleanValue
+      .replace(/^([A-Z]{2})/, '$1-')
+      .replace(/^([A-Z]{2}-\d{2})/, '$1-')
+      .replace(/^([A-Z]{2}-\d{2}-\d{2})/, '$1-')
+      .substring(0, 11);
   };
 
-  const addSpecification = (key: string, value: { label: string, description: string }) => {
-    const currentSpecifications = getValues('specifications');
+  const addImageToGallery = (imageUrl: string[]) => {
+    setValue('gallery', [...imageUrl]);
   };
+
+  const handleRemoveImage = (index: number) => {
+    const filters = getValues('gallery').filter((_, i) => i !== index)
+    setValue('gallery', [...filters]);
+  };
+
+  const handleRemoveAllImages = () => {
+    setValue('gallery', []);
+  }
 
   const onError = (errors: any) => {
+    // Get the first error message from the errors object
     const firstErrorKey = Object.keys(errors)[0];
-    const firstErrorMessage = errors[firstErrorKey]?.message || "Erro no formulário";
+    const firstErrorMessage = errors[firstErrorKey]?.message ?? 'Campo obrigatório';
+    
     toast({
       title: "Erro: Impossivel submeter formulário!",
       description: firstErrorMessage,
     });
   };
 
+  const handleSubmitAll = async () => {
+    setIsLoading(true);
+
+    if (useImageValues.images.length < 4) {
+      setIsLoading(false);
+      toast({
+        title: "Carregue no mínimo 4 imagens!",
+        description: "",
+      });
+      return;
+    }
+
+    const photoURLs = await useImageValues.actions.saveAll();
+    if (photoURLs) {
+      setValue("gallery", photoURLs);
+      // Now validate and submit form after gallery is set
+      const formState = getValues();
+      const validationResult = await vehicleSchema.safeParseAsync(formState);
+
+      if (!validationResult.success) {
+        const errors = validationResult.error.formErrors.fieldErrors;
+        const firstField = Object.keys(errors) as Array<keyof typeof errors>;
+        const firstMessage = firstField.length > 0 ? errors[firstField[0]]?.[0] : "Erro de validação";
+        
+        setIsLoading(false);
+        toast({
+          title: "Erro: Impossivel submeter formulário!",
+          description: firstMessage !== 'Required' ? firstMessage : "Todos os campos são de preenchimento obrigatório",
+        });
+        return;
+      }
+
+      onSubmit(getValues());
+    }
+  }
+
   const onSubmit = useCallback(async (data: VehicleFormData) => {
-    const result = await actions.handleSubmit({
-      ...data,
+    const specifications = [
+      { label: 'Combustível', description: data.fuel },
+      { label: 'Transmissão', description: data.transmission },
+      { label: 'Potência do Motor', description: `${data.enginePower} CV` },
+      { label: 'Localização', description: data.location },
+    ];
+    const { transmission, enginePower, fuel, location, ...rest } = data
+    addVehicle({
+      ...rest,
       dealershipId: "",
       vehicleId: "",
-      photo: "",
+      photo: data.gallery[0],
       userId: profile?.userId ?? "",
-      specifications: getValues("specifications") || []
-    });
+      specifications
+    }, 1);
     reset()
+    handleRemoveAllImages()
+
+    setTimeout(() => {
+      setIsLoading(false)
+      window.location.href = "/seller/inventory/";
+    }, 2000);
   }, [user]);
+
+  const formatPrice = (value: string): string => {
+    const numericValue = value.replace(/\D/g, "");
+
+    const integerPart = numericValue.slice(0, -2) || "0"; // Parte inteira (sem centavos)
+    const decimalPart = numericValue.slice(-2).padStart(2, "0"); // Parte decimal
+
+    // Converte para formato monetário
+    const formattedInteger = parseInt(integerPart, 10).toLocaleString("pt-AO");
+
+    // Retorna o valor formatado
+    return `AOA ${formattedInteger}, 00`;
+  };
+
+  const [value, setPriceValue] = useState("AOA 0,00")
 
   const sections = [
     (
@@ -186,6 +323,7 @@ const VehicleForm = () => {
             render={({ field }) => (
               <Select
                 value={field.value}
+
                 onValueChange={(value) => {
                   const selectedBrand = brandsList.find(
                     (b) => b.brandName === value
@@ -214,7 +352,6 @@ const VehicleForm = () => {
             <p className="text-red-600">{errors.brand.message}</p>
           )}
         </div>
-
         {/* Modelo */}
         <div>
           <Label className='ml-2'>Modelo</Label>
@@ -224,6 +361,7 @@ const VehicleForm = () => {
             render={({ field }) => (
               <Select
                 value={field.value}
+
                 onValueChange={(value) => setValue("model", value)}
               >
                 <SelectTrigger className="w-full mobile-input">
@@ -270,15 +408,27 @@ const VehicleForm = () => {
 
         {/* Matrícula */}
         <div>
-          <Label className='ml-2'>Matrícula</Label>
+          <Label className="ml-2">Matrícula</Label>
           <Controller
             name="licensePlate"
             control={control}
             render={({ field }) => (
               <Input
-                className='mobile-input'
+                className="mobile-input"
                 {...field}
                 placeholder="Digite a matrícula"
+
+                onChange={(e) => {
+                  if (e.target.value.length > changesOnLicence.length) {
+                    const formattedValue = formatLicensePlate(e.target.value);
+                    field.onChange(formattedValue); // Atualiza o estado controlado
+                    setChangesOnLicence(e.target.value)
+                  } else {
+                    field.onChange(e.target.value);
+                    setChangesOnLicence(e.target.value)
+                  }
+                }}
+                value={field.value} // Garante que o valor formatado seja exibido
               />
             )}
           />
@@ -298,6 +448,7 @@ const VehicleForm = () => {
                 className='mobile-input'
                 {...field}
                 placeholder="Digite o ano de fabricação"
+
               />
             )}
           />
@@ -311,15 +462,39 @@ const VehicleForm = () => {
       <>
         {/* Preço */}
         <div>
-          <Label className='ml-2'>Preço</Label>
+          <Label className="ml-2">Preço</Label>
           <Controller
             name="price"
             control={control}
             render={({ field }) => (
               <Input
-                className='mobile-input'
-                {...field}
+                className="mobile-input"
                 placeholder="Digite o preço"
+
+                value={value}
+                onChange={(e) => {
+                  // Remove tudo que não é número
+                  const numbersOnly = e.target.value.replace(/\D/g, '');
+
+                  // Converte para número e divide por 100 para considerar os centavos
+                  const numberValue = Number(numbersOnly) / 100;
+
+                  // Formata o número como moeda brasileira
+                  const formattedValue = new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                  }).format(numberValue);
+
+                  // Atualiza o estado com o valor formatado
+                  setPriceValue(formattedValue.replace('R$', 'AOA'));
+
+                  // Se precisar do valor numérico para enviar ao backend
+                  const numericValue = numberValue;
+
+                  setValue("price", numericValue.toString())
+                  console.log(getValues('price'));
+
+                }}
               />
             )}
           />
@@ -354,18 +529,56 @@ const VehicleForm = () => {
 
         {/* Quilometragem */}
         <div>
-          <Label className='ml-2'>Quilometragem</Label>
+          <Label className="ml-2">Quilometragem</Label>
           <Controller
             name="mileage"
             control={control}
-            render={({ field }) => (
-              <Input
-                className='mobile-input'
-                {...field}
-                placeholder="Digite a quilometragem"
-              />
-            )}
+            render={({ field }) => {
+              const formatMileage = (value: string) => {
+                // Remove non-numeric characters
+                const numbers = value.replace(/\D/g, '');
+
+                // Handle empty or zero value
+                if (!numbers || parseInt(numbers) === 0) {
+                  return "0,00";
+                }
+
+                // Convert to number and format with thousands separator and decimal places
+                const numeric = Number(numbers) / 100;
+                const formatted = new Intl.NumberFormat('pt-BR', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                }).format(numeric);
+
+                return formatted;
+              };
+
+              const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                const rawValue = e.target.value.replace(/\D/g, '');
+                const formattedValue = formatMileage(rawValue);
+
+                // Update display value
+                e.target.value = formattedValue;
+
+                // Store raw numeric value in form state
+                field.onChange(rawValue);
+              };
+
+              return (
+                <div className="relative">
+                  <Input
+                    className="mobile-input pr-16"
+                    value={formatMileage(field.value)}
+                    placeholder="0,00"
+                    onChange={handleInputChange}
+
+                  />
+                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">km</span>
+                </div>
+              );
+            }}
           />
+
           {errors.mileage && <p className="text-red-600">{errors.mileage.message}</p>}
         </div>
 
@@ -376,15 +589,34 @@ const VehicleForm = () => {
             name="color"
             control={control}
             render={({ field }) => (
-              <Input
-                className='mobile-input'
-                {...field}
-                placeholder="Digite a cor"
-              />
+              <Select
+                value={field.value}
+                onValueChange={(value) => setValue("color", value)}
+
+              >
+                <SelectTrigger className="w-full mobile-input">
+                  <SelectValue placeholder="Selecione a cor" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Colors.map((color) => (
+                    <SelectItem key={color.hex} value={color.nome}>
+                      <div className="flex items-center space-x-2">
+                        <div
+                          style={{ backgroundColor: color.hex }}
+                          className="w-4 h-4 rounded-full"
+                        />
+                        <span>{color.nome}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
           />
+
           {errors.color && <p className="text-red-600">{errors.color.message}</p>}
         </div>
+
 
         {/* Código de Barras */}
         <div>
@@ -397,6 +629,7 @@ const VehicleForm = () => {
                 className='mobile-input'
                 {...field}
                 placeholder="Digite o código de barras"
+
               />
             )}
           />
@@ -408,6 +641,91 @@ const VehicleForm = () => {
     ),
     (
       <>
+        <div>
+          <Label className="ml-2">Combustível</Label>
+          <Controller
+            name="fuel"
+            control={control}
+            render={({ field }) => (
+              <Select
+                value={field.value}
+                onValueChange={(value) => setValue("fuel", value as "Gasolina" | "Diesel" | "Elétrico" | "Híbrido")}
+
+              >
+                <SelectTrigger className="w-full mobile-input">
+                  <SelectValue placeholder="Selecione o tipo de combustível" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Gasolina">Gasolina</SelectItem>
+                  <SelectItem value="Diesel">Diesel</SelectItem>
+                  <SelectItem value="Elétrico">Elétrico</SelectItem>
+                  <SelectItem value="Híbrido">Híbrido</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.fuel && <p className="text-red-600">{errors.fuel.message}</p>}
+        </div>
+
+        <div>
+          <Label className="ml-2">Transmissão</Label>
+          <Controller
+            name="transmission"
+            control={control}
+            render={({ field }) => (
+              <Select
+                value={field.value}
+                onValueChange={(value) => setValue("transmission", value as "Manual" | "Automática" | "CVT")}
+
+              >
+                <SelectTrigger className="w-full mobile-input">
+                  <SelectValue placeholder="Selecione o tipo de transmissão" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Manual">Manual</SelectItem>
+                  <SelectItem value="Automática">Automática</SelectItem>
+                  <SelectItem value="CVT">CVT</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.transmission && <p className="text-red-600">{errors.transmission.message}</p>}
+        </div>
+
+        <div>
+          <Label className="ml-2">Potência do Motor (cv)</Label>
+          <Controller
+            name="enginePower"
+            control={control}
+            render={({ field }) => (
+              <Input
+                className="mobile-input"
+                {...field}
+                placeholder="Digite a potência do motor"
+
+              />
+            )}
+          />
+          {errors.enginePower && <p className="text-red-600">{errors.enginePower.message}</p>}
+        </div>
+
+        <div>
+          <Label className="ml-2">Localização</Label>
+          <Controller
+            name="location"
+            control={control}
+            render={({ field }) => (
+              <Input
+                className="mobile-input"
+                {...field}
+                placeholder="Digite a localização"
+
+              />
+            )}
+          />
+          {errors.location && <p className="text-red-600">{errors.location.message}</p>}
+        </div>
+
         {/* Código Interno */}
         <div>
           <Label className='ml-2'>Código Interno</Label>
@@ -438,6 +756,7 @@ const VehicleForm = () => {
                 className='mobile-input'
                 {...field}
                 placeholder="Digite uma descrição"
+
               />
             )}
           />
@@ -448,11 +767,15 @@ const VehicleForm = () => {
 
         {/* Galeria */}
         <div>
-          <Label className='ml-2'>Galeria (9 fotografias)</Label>
-          <div className="grid grid-cols-3 gap-1">
-            {Array.from({ length: 9 }).map((_, index) => (
-              <GalleryItem key={index} add={addImageToGallery} />
-            ))}
+          <Label className='ml-2'>Galeria (de 4 à 15 fotografias)</Label>
+          <div className="w-full">
+
+            <GalleryItem
+              {...useImageValues}
+              remove={handleRemoveImage}
+              add={addImageToGallery}
+            />
+
           </div>
           {errors.gallery && (
             <p className="text-red-600">{errors.gallery.message}</p>
@@ -484,31 +807,31 @@ const VehicleForm = () => {
         <h2 className="text-2xl text-center font-semibold">Adicionar novo veículo</h2>
 
 
-        <div className='flex items-center gap-4'>
+        {/* <div className='flex items-center gap-4'>
           <Stepper currentStep={currentSection} setCurrentStep={setCurrentSection} />
-        </div>
+        </div> */}
 
-        <div className='flex flex-col gap-2'>
-          {sections[currentSection]}
+        <div className='flex flex-col gap-2 pb-12'>
+          {sections[0]}
+          {sections[1]}
+          {sections[2]}
         </div>
 
         <div className="flex justify-between">
-          {currentSection > 0 && (
-            <Button type="button" onClick={handlePrevious}>
-              Voltar
-            </Button>
-          )}
-          {currentSection < sections.length - 1 ? (
-            <Button type="button" onClick={handleNext}>
-              Próximo
-            </Button>
-          ) : (
-            <Button type="submit" className="bg-blue-600 text-white">
-              Cadastrar veículo
-            </Button>
-          )}
+
+          <Button type="button" onClick={handleSubmitAll} className="w-full max-w-md py-6 mb-6 bg-[var(--black)] text-white rounded-full text-lg font-medium">
+            Cadastrar veículo
+          </Button>
+          {/* )} */}
         </div>
       </form>
+      {isLoading && (
+        <div className="absolute inset-0 bg-black/50 flex justify-center items-center">
+          <div className="bg-white rounded text-black">
+            <Loader />
+          </div>
+        </div>
+      )}
     </>
   );
 };

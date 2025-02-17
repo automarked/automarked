@@ -1,7 +1,7 @@
 {
-    "theme_color": "#ffffff",
+    "theme_color": "#ffffff",    
     "background_color": "#ffffff",
-    "icons": [    
+    "icons": [
         {
             "purpose": "maskable",
             "sizes": "512x512",
@@ -19,9 +19,9 @@
     "display": "standalone",
     "dir": "auto",
     "lang": "pt-PT",
-    "name": "Cliente Automarked",
-    "short_name": "Cliente Automarked",
-    "start_url": "https://clientauto.vercel.app",
-    "scope": "https://clientauto.vercel.app",
+    "name": "Automarked",
+    "short_name": "Automarked",
+    "start_url": "https://automarket-A3D.vercel.app",
+    "scope": "https://automarket-A3D.vercel.app",
     "description": "Automarked"
 }

@@ -1,12 +1,14 @@
 import { Chat } from "@/models/chatMessage";
 import { formatRelativeDate } from "@/scripts/relative-date";
-import { Search, Pin, MessageCircle, Menu, Bell } from "lucide-react";
+import { Menu, Bell } from "lucide-react";
 import { useState } from "react";
 import SearchInput from "./input-search";
 import { useMaterialLayout } from "@/contexts/LayoutContext";
 import { useNotificationContext } from "@/contexts/notificationContext";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import GoBack from "../goBack";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function ChatSidebar({ user, chats, setChat }: {
     user: {
@@ -23,15 +25,17 @@ export default function ChatSidebar({ user, chats, setChat }: {
     const [search, setSearch] = useState('')
 
     const handleChatClick = (chatId: string) => {
+        console.log(chatId)
         router.push(`/seller/chat/${chatId}`);
     };
-    
+
     return (
         <div className="flex flex-col w-full md:max-w-sm h-screen bg-white border-r shadow-sm">
             {/* Search */}
             <div className="flex justify-between items-center">
                 <div className="flex justify-between w-full items-end">
-                    <div className="px-4 text-lg pt-8 font-bold text-black">
+                    <GoBack className='top-7' />
+                    <div className="ms-8 px-4 text-lg pt-8 font-bold text-black">
                         Conversas
                     </div>
                     <button onClick={() => toggleSidebar()} className="hidden md:flex mr-4 p-2 rounded-full hover:bg-gray-100">
@@ -64,21 +68,23 @@ export default function ChatSidebar({ user, chats, setChat }: {
             <div className="px-4 py-2 text-xs font-semibold text-gray-500">
                 Todas as mensagens
             </div>
-            {search.trim() && (
-                <strong className="pl-4 py-2 font-bold">{`Resultados para "${search}"`}</strong>
-            )}
+            {
+                search.trim() && (
+                    <strong className="pl-4 py-2 font-bold">{`Resultados para "${search}"`}</strong>
+                )
+            }
             <div className="hidden px-4 md:block overflow-y-scroll">
-                {!search.trim() ? chats.map((chat, i) => (                    
+                {!search.trim() ? chats.map((chat, i) => (
                     <div
                         onClick={() => setChat(chat)}
                         key={i}
                         className="flex items-center justify-between gap-2 py-3 hover:bg-gray-100 border-b  cursor-pointer"
                     >
                         <div className="flex items-center gap-2">
-                            <div className="w-12 h-12 border-2 border-black p-0.5 overflow-hidden rounded-full">                                
+                            <div className="w-12 h-12 border-2 border-black p-0.5 overflow-hidden rounded-full">
                                 <Image
-                                    width={50}
-                                    height={50}
+                                    width={56}
+                                    height={56}
                                     src={chat.chatWith.photo}
                                     alt="User"
                                     className="object-cover rounded-full w-full h-full"
@@ -117,15 +123,24 @@ export default function ChatSidebar({ user, chats, setChat }: {
                         className="flex items-center justify-between gap-2 py-3 hover:bg-gray-100 border-b  cursor-pointer"
                     >
                         <div className="flex items-center gap-2">
-                            <div className="w-12 h-12 border-2 border-black p-0.5 overflow-hidden rounded-full">
-                                <Image
-                                    width={50}
-                                    height={50}
-                                    src={chat.chatWith.photo}
-                                    alt="User"
-                                    className="object-cover rounded-full w-full h-full"
-                                />
-                            </div>
+                           <div className="w-12 h-12 border-2 border-black p-0.5 overflow-hidden rounded-full">
+    {chat.chatWith.photo ? (
+        <Image
+            width={50}
+            height={50}
+            src={chat.chatWith.photo}
+            alt="User"
+            className="object-cover rounded-full w-full h-full"
+        />
+    ) : (
+        <Avatar>
+            <AvatarFallback>
+                {chat.chatWith.name.split(' ')[0][0]}
+                {chat.chatWith.name.split(' ')[1]?.[0]}
+            </AvatarFallback>
+        </Avatar>
+    )}
+</div>
                             <div>
                                 <p className="text-base font-medium">{chat.chatWith.name}</p>
                                 <p className="text-sm text-gray-500 truncate">
@@ -152,20 +167,29 @@ export default function ChatSidebar({ user, chats, setChat }: {
             <div className="flex-1 px-4 md:hidden overflow-y-scroll">
                 {!search.trim() ? chats.map((chat, i) => (
                     <div
-                        onClick={() => handleChatClick(chat.chatWith.userId)}
+                        onClick={() => handleChatClick(user?.uid + '_' + chat.chatWith.userId)}
                         key={i}
                         className="flex items-center justify-between gap-2 py-3 hover:bg-gray-100 border-b  cursor-pointer"
                     >
                         <div className="flex items-center gap-2">
-                            <div className="w-12 h-12 border-2 border-black p-0.5 overflow-hidden rounded-full">
-                                <Image
-                                    width={50}
-                                    height={50}
-                                    src={chat.chatWith.photo}
-                                    alt="User"
-                                    className="object-cover rounded-full w-full h-full"
-                                />
-                            </div>
+                           <div className="w-12 h-12 border-2 border-black p-0.5 overflow-hidden rounded-full">
+    {chat.chatWith.photo ? (
+        <Image
+            width={50}
+            height={50}
+            src={chat.chatWith.photo}
+            alt="User"
+            className="object-cover rounded-full w-full h-full"
+        />
+    ) : (
+        <Avatar>
+            <AvatarFallback>
+                {chat.chatWith.name.split(' ')[0][0]}
+                {chat.chatWith.name.split(' ')[1]?.[0]}
+            </AvatarFallback>
+        </Avatar>
+    )}
+</div>
                             <div>
                                 <p className="text-base font-medium">{chat.chatWith.name}</p>
                                 <p className="text-sm text-gray-500 truncate">
@@ -199,15 +223,24 @@ export default function ChatSidebar({ user, chats, setChat }: {
                         className="flex items-center justify-between gap-2 py-3 hover:bg-gray-100 border-b  cursor-pointer"
                     >
                         <div className="flex items-center gap-2">
-                            <div className="w-12 h-12 border-2 border-black p-0.5 overflow-hidden rounded-full">
-                                <Image
-                                    width={50}
-                                    height={50}
-                                    src={chat.chatWith.photo}
-                                    alt="User"
-                                    className="object-cover rounded-full w-full h-full"
-                                />
-                            </div>
+                           <div className="w-12 h-12 border-2 border-black p-0.5 overflow-hidden rounded-full">
+    {chat.chatWith.photo ? (
+        <Image
+            width={50}
+            height={50}
+            src={chat.chatWith.photo}
+            alt="User"
+            className="object-cover rounded-full w-full h-full"
+        />
+    ) : (
+        <Avatar>
+            <AvatarFallback>
+                {chat.chatWith.name.split(' ')[0][0]}
+                {chat.chatWith.name.split(' ')[1]?.[0]}
+            </AvatarFallback>
+        </Avatar>
+    )}
+</div>
                             <div>
                                 <p className="text-base font-medium">{chat.chatWith.name}</p>
                                 <p className="text-sm text-gray-500 truncate">
@@ -230,6 +263,6 @@ export default function ChatSidebar({ user, chats, setChat }: {
                     </div>
                 ))}
             </div>
-        </div>
+        </div >
     );
 }

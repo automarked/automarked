@@ -13,9 +13,7 @@ export default function Notifications() {
     const { notifications, markAllAsRead, deleteNotification } = useNotificationContext()
     
     useEffect(() => {
-        (async () => {
-            await markAllAsRead()
-        })()
+            markAllAsRead()
     }, [])
 
     const handleDeleteNotification = async (notificationId: string) => {

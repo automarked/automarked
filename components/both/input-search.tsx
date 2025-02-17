@@ -1,17 +1,14 @@
 import { Search } from "lucide-react"; // Usando lucide-react para o ícone de busca
 import React from "react";
 
-const SearchInput: React.FC<{ dark?: boolean, value: string, setValue: (tag: string) => void, className?: string }> = ({ setValue, value, dark, className }) => {
+const SearchInput: React.FC<{ dark?: boolean, value: string, setValue: (tag: string) => void }> = ({ setValue, value, dark }) => {
   return (
-    <div data-dark={dark} className={`flex items-center justify-between bg-global data-[dark=true]:bg-[var(--input)] rounded-lg p-3 w-full ${className}`}>
+    <div data-dark={dark} className="flex items-center justify-between bg-white data-[dark=true]:bg-[var(--input)] rounded-lg p-3 w-full">
       {/* Input com ícone de lupa */}
       <div className="flex items-center  gap-2 w-full">
-        <label htmlFor="search" className="">
-          <Search className="w-5 h-5 text-gray-400" />
-        </label>
+        <Search className="w-5 h-5 text-gray-400" />
         <input
           type="text"
-          id="search"
           placeholder="Procurar"
           value={value}
           className="bg-transparent outline-none text-gray-600 placeholder:text-gray-400 w-full"
@@ -20,7 +17,7 @@ const SearchInput: React.FC<{ dark?: boolean, value: string, setValue: (tag: str
       </div>
 
       {/* Ícone de configurações */}
-      {/* <button className="flex items-center justify-center w-8 h-8 bg-global rounded-full shadow-sm hover:bg-gray-200 transition">
+      <button className="flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-sm hover:bg-gray-200 transition">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -40,7 +37,7 @@ const SearchInput: React.FC<{ dark?: boolean, value: string, setValue: (tag: str
             d="M19.5 19.5l-4.035-4.035"
           />
         </svg>
-      </button> */}
+      </button>
     </div>
   );
 };

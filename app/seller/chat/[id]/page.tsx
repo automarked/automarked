@@ -2,12 +2,11 @@
 
 import { useUser } from "@/contexts/userContext"
 import ChatScreen from "./chat"
-import { useAuth } from "@/contexts/AuthContext"
 
 export default function ChatWith ({ params }: { params: { id: string } }) {
-    const { user } = useAuth()
-    const { profile: sender } = useUser(user?.uid ?? '')
-    const { profile: receiver } = useUser(params.id)
+    const [senderId, receiverId] = params.id.split('_')
+    const { profile: sender } = useUser(senderId ?? '')
+    const { profile: receiver } = useUser(receiverId ?? '')
 
     if (sender && receiver)
     return (

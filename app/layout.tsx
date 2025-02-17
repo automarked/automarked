@@ -18,7 +18,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Cliente Automarked",
+  title: "Automarked",
   description: "",
   manifest: "/manifest.json",
   keywords: ["automarked", "venda automóveis"],
