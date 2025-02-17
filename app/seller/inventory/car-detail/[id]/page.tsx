@@ -1,15 +1,15 @@
 'use client'
 
 import CarViewer from "@/components/both/car-viewer";
+import { useInventoryContext } from "@/contexts/InventoryContext";
 import { useUser } from "@/contexts/userContext";
 import { createdInstance } from "@/hooks/useApi";
-import useInventory from "@/hooks/useInventory";
 import { Vehicle } from "@/models/vehicle";
 import { useCallback, useEffect, useState } from "react";
 
 export default function CardDetail({ params }: { params: { id: string } }) {
     const { user } = useUser()
-    const { removeVehicle: deleteVehicleFromInventory } = useInventory(user?.uid ?? "")
+    const { removeVehicle: deleteVehicleFromInventory } = useInventoryContext()
 
     const onDelete = useCallback((vehicleToDelete: Vehicle) => {
         deleteVehicleFromInventory(vehicleToDelete.vehicleId);
