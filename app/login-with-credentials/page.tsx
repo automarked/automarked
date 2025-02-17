@@ -156,7 +156,7 @@ const LoginWithCredentials = () => {
         </div> */}
 
         {/* Esqueci a senha */}
-        <p className="mt-8 text-gray-500">
+        {/*<p className="mt-8 text-gray-500">
           Ainda não tem uma conta?{" "}
           <button
             onClick={() => router.push("/signup")}
@@ -164,7 +164,7 @@ const LoginWithCredentials = () => {
           >
             crie sua conta
           </button>
-        </p>
+        </p>*/}
       </div>
     </div>
   );
