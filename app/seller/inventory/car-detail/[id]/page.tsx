@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 
 export default function CardDetail({ params }: { params: { id: string } }) {
     const { user } = useUser()
+    const { profile } = useUser(user?.uid ?? '');
     const { removeVehicle: deleteVehicleFromInventory } = useInventoryContext()
 
     const onDelete = useCallback((vehicleToDelete: Vehicle) => {
@@ -17,7 +18,7 @@ export default function CardDetail({ params }: { params: { id: string } }) {
 
     const [vehicle, setVehicle] = useState<Vehicle>()
     const getById = useCallback(async (id: string) => {
-        const response = await createdInstance.get<{ record: Vehicle }>('/vehicles/'+id)
+        const response = await createdInstance.get<{ record: Vehicle }>('/vehicles/' + id)
         if (response.status <= 201) setVehicle(response.data.record)
     }, [user, params])
 
@@ -26,9 +27,9 @@ export default function CardDetail({ params }: { params: { id: string } }) {
     }, [user, params])
 
     if (vehicle && user)
-    return (
-        <>
-            <CarViewer user={user} type="seller" onDelete={onDelete} vehicle={vehicle}/>
-        </>
-    )
+        return (
+            <>
+                <CarViewer user={user} type={profile?.type ?? "seller"} onDelete={onDelete} vehicle={vehicle} />
+            </>
+        )
 }

@@ -58,6 +58,7 @@ import {
 import { Button } from '../ui/button';
 import useWishlist from '@/hooks/useWishList';
 import { InventoryItem } from '@/models/inventory';
+import { useRouter } from 'next/navigation';
 
 export function CarouselSpacing() {
     return (
@@ -87,14 +88,15 @@ export function CarouselSpacing() {
 }
 
 
-const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user: { name: string, email: string, uid: string }, type: "costumer" | "seller" }> = ({ vehicle, user, type, onDelete }) => {
+const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user: { name: string, email: string, uid: string }, type: "customer" | "seller" | "collaborator" }> = ({ vehicle, user, type, onDelete }) => {
+    const router = useRouter()
     const { addVehicle } = useShoppingCart(user.uid)
     const { actions } = useWishlist(user.uid)
     const { profile: chatWith } = useUser(vehicle.userId)
     const [isExpanded, setIsExpanded] = useState(false);
     const [image, setImage] = useState<string | null>(null);
 
-    const truncatedDescription = vehicle.description.length > 200
+    const truncatedDescription = vehicle.description?.length > 200
         ? vehicle.description.slice(0, 200) + '...'
         : vehicle.description;
 
@@ -107,8 +109,17 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
         console.log('Adicionado ao carrinho');
     }, [vehicle, addVehicle]);
 
+    const handleRemoveVehicle = useCallback(async () => {
+        if (onDelete && vehicle) {
+            onDelete(vehicle)
+            router.push('/seller/inventory')
+        }
+    }, [vehicle, onDelete]);
+
+    
+
     return (
-        <div className="flex flex-col items-center bg-white p-0 mb-32">
+        <div className="flex flex-col items-center h-screen bg-white p-0 mb-32">
 
             {/* Car Image */}
             <Image
@@ -132,7 +143,7 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                     <h2 className="text-xl font-semibold mb-2">Descrição</h2>
                     <p className='font-light'>
                         {isExpanded ? vehicle.description : truncatedDescription}
-                        {vehicle.description.length > 200 && (
+                        {vehicle.description?.length > 200 && (
                             <button
                                 onClick={() => setIsExpanded(!isExpanded)}
                                 className="text-blue-500 mt-2"
@@ -168,7 +179,7 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                 </Carousel>
                 <br />
 
-                {type === 'costumer' && chatWith?.photo && (
+                {type === 'customer' && chatWith?.photo && (
                     <div className='flex items-center justify-between w-full'>
                         <div className="flex items-start gap-2 mb-6">
                             <Image
@@ -234,7 +245,7 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                                         <div className="flex items-center gap-2">
                                             <span className="px-1 py-0.5 text-xs font-bold bg-gray-100">AOA</span>
                                             <p className="text-xl font-bold">{vehicle.price},00</p>
-                                        </div>                                        
+                                        </div>
                                     </div>
                                 </div>
                                 <DrawerFooter>
@@ -247,7 +258,7 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                         </Drawer>
                     </div>
                     <br />
-                    {type === "costumer" && (
+                    {type === "customer" && (
                         <AlertDialog>
                             <AlertDialogTrigger className="px-6 py-2 bg-blue-500 text-white w-full rounded">Adicionar a lista de desejos</AlertDialogTrigger>
                             <AlertDialogContent className='max-w-[90%] rounded-md'>
@@ -266,7 +277,7 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                     )}
                 </div>
 
-                {type === 'costumer' && (
+                {type === 'customer' && (
                     <AlertDialog>
                         <AlertDialogTrigger className="w-full py-2 bg-green-500 text-white rounded mt-4">Adicionar no carrinho</AlertDialogTrigger>
                         <AlertDialogContent className='max-w-[90%] rounded-md'>
@@ -287,18 +298,18 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                 {type === 'seller' && onDelete && (
                     <AlertDialog>
                         <AlertDialogTrigger>
-                            <Button onClick={() => onDelete(vehicle)}>Eliminar do inventário</Button>
+                            <Button>Eliminar do inventário {type}</Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent className='max-w-[90%] rounded-md'>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Deseja adicionar <strong>{vehicle.brand} {vehicle.model} </strong>ao seu carrinho de compras?</AlertDialogTitle>
+                            <AlertDialogHeader className="px-4">
+                                <AlertDialogTitle className="leading-6">Tem a certeza que deseja apagar este veículo?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    Esta operação pode ser desfeita ao eliminar o veículo de sua lista
+                                    Esta açao não pode ser desfeita.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancele</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleAddToCart}>Adicione</AlertDialogAction>
+                            <AlertDialogFooter className="px-4 pb-4">
+                                <AlertDialogCancel className="rounded-3xl py-4">Não, cancela</AlertDialogCancel>
+                                <AlertDialogAction className="rounded-3xl py-4" onClick={handleRemoveVehicle}>Tenho</AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>

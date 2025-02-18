@@ -79,18 +79,18 @@ export default function AccountSettings() {
     return (
         <div className="w-full p-6 space-y-6 ">
             <h2 className="text-2xl font-bold helvetica-sans-serif">Contas associadas</h2>
-            <div className="grid grid-cols-12">
+            <div className="flex flex-col">
                 {/* Header */}
-                <div className="flex items-center space-x-4 col-span-3">
+                {/* <div className="flex items-center space-x-4 col-span-3">
                     <Avatar className="w-20 h-20">
                         <AvatarImage src="/profile.jpg" alt="Profile Image" />
                         <AvatarFallback>RD</AvatarFallback>
                     </Avatar>
                     <div>
-                        <h1 className="text-xl font-bold">Richard Davis</h1>
+                        <h1 className="text-xl font-bold"></h1>
                         <p className="text-sm text-muted-foreground">CEO / Co-Founder</p>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Basic Info */}
                 <form className="col-span-9" onSubmit={handleSubmit(handleCreateCollaborator)}>
@@ -103,14 +103,14 @@ export default function AccountSettings() {
                                 {/* First Name */}
                                 <div>
                                     <label className="block text-sm font-medium">Primeiro nome</label>
-                                    <Input placeholder="Richard" {...register("firstName")} />
+                                    <Input placeholder="John" {...register("firstName")} />
                                     {errors.firstName && <span className="text-red-500">{errors.firstName.message}</span>}
                                 </div>
 
                                 {/* Last Name */}
                                 <div>
                                     <label className="block text-sm font-medium">Apelido</label>
-                                    <Input placeholder="Davis" {...register("lastName")} />
+                                    <Input placeholder="Simon" {...register("lastName")} />
                                     {errors.lastName && <span className="text-red-500">{errors.lastName.message}</span>}
                                 </div>
 
@@ -132,21 +132,21 @@ export default function AccountSettings() {
                                 {/* Birth Date */}
                                 <div>
                                     <label className="block text-sm font-medium">Data de nascimento</label>
-                                    <Input placeholder="dd/MM/yyy" type="text" {...register("birthDate")} />
+                                    <Input placeholder="dd/mm/aaa" type="text" {...register("birthDate")} />
                                     {errors.birthDate && <span className="text-red-500">{errors.birthDate.message}</span>}
                                 </div>
 
                                 {/* Email */}
                                 <div>
                                     <label className="block text-sm font-medium">Email</label>
-                                    <Input placeholder="example@gmail.com" type="email" {...register("email")} />
+                                    <Input placeholder="exemplo@gmail.com" type="email" {...register("email")} />
                                     {errors.email && <span className="text-red-500">{errors.email.message}</span>}
                                 </div>
 
                                 {/* Confirm Email */}
                                 <div>
                                     <label className="block text-sm font-medium">Confirme o Email</label>
-                                    <Input placeholder="example@gmail.com" type="email" {...register("repeatEmail")} />
+                                    <Input placeholder="exemplo@gmail.com" type="email" {...register("repeatEmail")} />
                                     {errors.repeatEmail && <span className="text-red-500">{errors.repeatEmail.message}</span>}
                                 </div>
 

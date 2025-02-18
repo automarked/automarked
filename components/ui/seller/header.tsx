@@ -10,6 +10,7 @@ import { FaComment } from 'react-icons/fa';
 import { BsChatLeftText } from "react-icons/bs";
 import { useNotificationContext } from '@/contexts/notificationContext';
 import { Badge } from '../badge';
+import { profileType } from '@/utils/profileType';
 
 const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: string }, toggleSidebar: () => void }> = ({
   user,
@@ -37,7 +38,7 @@ const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: stri
               className="w-12 border-[var(--black)] border-2 p-0.5 h-12 object-cover rounded-full cursor-pointer"
             />
             <div>
-              <Badge variant={"outline"}>Vendedor</Badge><br />
+              <Badge variant={"outline"}>{profileType[profile.type]}</Badge><br />
               <strong>{profile.firstName} {profile.lastName}</strong>
             </div>
           </div>

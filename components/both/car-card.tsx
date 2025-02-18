@@ -8,6 +8,8 @@ import useVehicle from "@/hooks/useVehicle";
 import { Button } from "../ui/button";
 import { FaTrash } from "react-icons/fa";
 import Image from "next/image";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUser } from "@/contexts/userContext";
 
 const CarCard: React.FC<{ vehicle: InventoryItem, onDelete: React.Dispatch<React.SetStateAction<InventoryItem | undefined>> }> = ({
     vehicle,
@@ -21,6 +23,8 @@ const CarCard: React.FC<{ vehicle: InventoryItem, onDelete: React.Dispatch<React
         }
     } = useVehicle()
     const { vehicles } = vehicle
+    const { user } = useAuth();
+    const { profile } = useUser(user?.uid ?? '');
 
     const [ocurrencyOnWishlist, setOcurrencyOnWishlist] = useState<number>(0)
     const [ocurrencyOnShoppingCart, setOcurrencyOnShoppingCart] = useState<number>(0)
@@ -44,9 +48,11 @@ const CarCard: React.FC<{ vehicle: InventoryItem, onDelete: React.Dispatch<React
                     alt={vehicles.vehicleId}
                     className="w-full h-full object-cover"
                 />
-                <Button onClick={() => onDelete(vehicle)} className="absolute top-3 right-3 bg-white rounded-full p-1 w-8 h-8 shadow text-black hover:bg-gray-100">
-                    <FaTrash />
-                </Button>
+                {profile?.type === "seller" &&
+                    <Button onClick={() => onDelete(vehicle)} className="absolute top-3 right-3 bg-white rounded-full p-1 w-8 h-8 shadow text-black hover:bg-gray-100">
+                        <FaTrash />
+                    </Button>
+                }
             </div>
             <div className="relative cursor-pointer h-24 p-2 bg-white w-full" onClick={() => router.push(`/seller/inventory/car-detail/${vehicles.vehicleId}`)}>
                 <h3 className="font-semibold text-gray-800 text-base">{vehicles.brand} {vehicles.model}</h3>

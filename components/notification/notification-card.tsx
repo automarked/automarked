@@ -1,6 +1,7 @@
 import { clsx } from "clsx";
 import { Bell, Trash2 } from "lucide-react";
 import Image from "next/image";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface NotificationCardProps {
   avatar: string;
@@ -23,6 +24,9 @@ export function NotificationCard({
   children,
   onDelete
 }: NotificationCardProps) {
+
+
+
   return (
     <div
       className={clsx(
@@ -30,13 +34,23 @@ export function NotificationCard({
         unread && "bg-gray-50"
       )}
     >
-      <Image
-        width={100}
-        height={100}
-        src={avatar}
-        alt={`${name}'s avatar`}
-        className="w-10 h-10 rounded-full object-cover"
-      />
+      {avatar ? (
+        <Image
+          width={100}
+          height={100}
+          src={avatar}
+          alt={`${name}'s avatar`}
+          className="w-10 h-10 rounded-full object-cover"
+        />
+      ) : (
+
+        <Avatar>
+          <AvatarFallback>
+            {name.split(" ")[0][0]}
+            {name.split(" ")[1][0]}
+          </AvatarFallback>
+        </Avatar>
+      )}
       <div className="flex-1">
         <div className="text-sm">
           <span className="font-semibold">{name}</span>{" "}
@@ -49,8 +63,8 @@ export function NotificationCard({
       </div>
       {children && children}
       {unread && <Bell className="w-5 h-5 text-blue-500" />}
-      
-      <button 
+
+      <button
         onClick={onDelete}
         className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
       >

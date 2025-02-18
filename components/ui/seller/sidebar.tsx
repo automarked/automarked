@@ -9,6 +9,8 @@ import { useUser } from "@/contexts/userContext";
 import Image from "next/image";
 import { useChatContext } from "@/contexts/chatContext";
 import { useEffect } from "react";
+import { profileType } from "@/utils/profileType";
+import { Badge } from "../badge";
 
 const Sidebar: React.FC<{ currentProfile: IUser; isOpen: boolean, closeSidebar: () => void }> = ({ currentProfile, isOpen, closeSidebar }) => {
     const { unreadMessagesCount, unreadNotifications } = useNotificationContext();
@@ -41,7 +43,9 @@ const Sidebar: React.FC<{ currentProfile: IUser; isOpen: boolean, closeSidebar: 
             <nav className="flex-1 mt-4 px-4 space-y-2">
                 <SidebarItem closeSidebar={closeSidebar} icon={<BarChart2 />} label="Dashboard" link="/seller" />
                 <SidebarItem closeSidebar={closeSidebar} icon={<FaCar />} label="Inventário" link="/seller/inventory" />
-                <SidebarItem closeSidebar={closeSidebar} icon={<FaCar />} label="Comerciais" link="/seller/account-settings" />
+                {currentProfile.type === "seller" &&
+                    <SidebarItem closeSidebar={closeSidebar} icon={<FaCar />} label="Comerciais" link="/seller/account-settings" />
+                }
 
                 <SidebarGroup title="Tempo Real">
                     <div className="relative">

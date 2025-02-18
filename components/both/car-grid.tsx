@@ -20,7 +20,6 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const CarGrid: React.FC<{ inventory: InventoryItem[], searchOnList: string, onDelete: (item: InventoryItem) => void }> = ({ inventory, searchOnList, onDelete }) => {
   const [vehicle, setVehicle] = useState<InventoryItem>()
-  const { user } = useAuth();
 
   return (
     <>

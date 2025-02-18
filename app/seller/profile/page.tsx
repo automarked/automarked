@@ -13,6 +13,7 @@ import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from 'next/navigation';
 import { AUTHORIZED_ADMINS } from "@/constants/auth";
+import { profileType } from "@/utils/profileType";
 
 const ProfileForm = () => {
     const {
@@ -44,7 +45,7 @@ const ProfileForm = () => {
                     admin.permissions.includes('CREATE_USERS')
             );
 
-            if (isAuthorizedAdmin) {                
+            if (isAuthorizedAdmin) {
                 setIsAuthorized(true)
             }
         };
@@ -100,9 +101,9 @@ const ProfileForm = () => {
                                 height={150}
                                 className="w-28 border-[var(--black)] p-1 border-2 h-28 object-cover rounded-full "
                             />
-                            <Badge variant="outline">{profile.type === "seller" ? "Concessonário" : "Cliente"}</Badge>
+                            <Badge variant={"outline"}>{profileType[profile.type]}</Badge>
 
-                            <button
+                            {profile.type === "seller" && <button
                                 data-preview={activeImagePreview}
                                 className="absolute bottom-8 -right-2 data-[preview=false]:bg-black data-[preview=true]:bg-red-900 text-white w-8 h-8 rounded-lg p-2"
                                 onClick={() => activeImagePreview ? handleDiscardImage(0) : selectImage()}
@@ -112,7 +113,7 @@ const ProfileForm = () => {
                                 ) : (
                                     <FontAwesomeIcon icon={faPencilAlt} />
                                 )}
-                            </button>
+                            </button>}
                         </div>
                         <br />
                         <strong className="font-bold text-[var(--black)]">{profile.companyName}</strong>
@@ -215,20 +216,22 @@ const ProfileForm = () => {
                         {imagePreview && (
                             <Image width={500} height={300} alt="Foto de Capa" src={imagePreview} className="w-full h-full object-cover" />
                         )}
-                        <button
-                            data-preview={imagePreview ? true : false}
-                            className="absolute bottom-8 -right-2 data-[preview=false]:bg-black data-[preview=true]:bg-red-900 text-white w-8 h-8 rounded-lg p-2"
-                            onClick={() => imagePreview ? (() => {
-                                actions.discard(0)
-                                setImagePreview(undefined)
-                            })() : actions.selectImages()}
-                        >
-                            {imagePreview ? (
-                                <FontAwesomeIcon icon={faTrash} />
-                            ) : (
-                                <FontAwesomeIcon icon={faPencilAlt} />
-                            )}
-                        </button>
+                        {profile.type === "seller" &&
+                            <button
+                                data-preview={imagePreview ? true : false}
+                                className="absolute bottom-8 -right-2 data-[preview=false]:bg-black data-[preview=true]:bg-red-900 text-white w-8 h-8 rounded-lg p-2"
+                                onClick={() => imagePreview ? (() => {
+                                    actions.discard(0)
+                                    setImagePreview(undefined)
+                                })() : actions.selectImages()}
+                            >
+                                {imagePreview ? (
+                                    <FontAwesomeIcon icon={faTrash} />
+                                ) : (
+                                    <FontAwesomeIcon icon={faPencilAlt} />
+                                )}
+                            </button>
+                        }
                     </div>
                     <div className="flex flex-col w-full justify-center gap-4">
                         <button
