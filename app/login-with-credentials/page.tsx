@@ -169,6 +169,25 @@ const LoginWithCredentials = () => {
             crie sua conta
           </button>
         </p>*/}
+        <p className="mt-8 text-gray-500 text-xs">
+          Pode rever a {" "}
+          <a
+            href="/legal/privacy-policy"
+            target="_blank"
+            className="font-bold text-blue-400"
+          >
+            Política de Privacidade
+          </a>
+          {" "}e os{" "}
+          <a
+            href="/legal/terms-and-conditions"
+            target="_blank"
+            className="font-bold text-blue-400"
+          >
+            Termos de Utilização
+          </a>
+          {" "} da nossa app antes de a utilizar.
+        </p>
       </div>
     </div>
   );
