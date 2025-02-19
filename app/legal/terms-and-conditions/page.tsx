@@ -5,16 +5,16 @@ import Image from "next/image";
 
 export default function TermsOfUse() {
   return (
-    <div className="max-w-4xl mx-auto p-6 text-gray-900 dark:text-gray-100">
+    <div className="max-w-4xl mx-auto px-4 py-6 text-gray-900 dark:text-gray-100">
       <div className="fixed left-0 right-0 top-0 w-screen flex items-center h-12 bg-white shadow-sm">
         <GoBack className='relative mt-[-15px]' />
         <div className="flex items-center mx-auto space-x-2">
-          <Image
+          {/* <Image
             src={"/images/logo.png"}
             width={30}
             height={30}
             alt="Logo da Automarked"
-          />
+          /> */}
           <h1 className="font-semibold">Automarked</h1>
         </div>
       </div>

@@ -24,7 +24,7 @@ const Sidebar: React.FC<{ currentProfile: IUser; isOpen: boolean, closeSidebar: 
     return (
         <div
             data-open={isOpen}
-            className={`fixed top-0 z-[999] left-0 h-screen w-64 bg-[#1e293b] text-white transform transition-transform duration-300 ease-in-out data-[open=true]:translate-x-0 data-[open=false]:-translate-x-full md:translate-x-0 md:static`}
+            className={`fixed top-0 z-[999] left-0 h-screen w-64 bg-[#1e293b] text-white transform transition-transform duration-300 ease-in-out data-[open=true]:translate-x-0 data-[open=false]:-translate-x-full md:translate-x-0 md:static flex flex-col`}
         >
             {/* Perfil do Usuário */}
             <div className="flex flex-col items-center py-6 border-b border-gray-700">
@@ -73,11 +73,13 @@ const Sidebar: React.FC<{ currentProfile: IUser; isOpen: boolean, closeSidebar: 
                         )}
                     </div>
                 </SidebarGroup>
-                {/* <SidebarGroup title="Auto Market">
-                    <SidebarItem closeSidebar={closeSidebar} icon={<Megaphone />} label="Anúncios" link="/seller/ads" />
-                    <SidebarItem closeSidebar={closeSidebar} icon={<Settings />} label="Configurações" link="/seller/account-settings" />
-                </SidebarGroup> */}
             </nav>
+            <div className="flex h-full w-full items-end p-4 space-y-2">
+                <SidebarGroup title="Automarked">
+                    <SidebarItem closeSidebar={closeSidebar} icon={""} label="Políticas de Privacidade" link="/legal/privacy-policy" />
+                    <SidebarItem closeSidebar={closeSidebar} icon={""} label="Termos de Utilização" link="/legal/terms-and-conditions" />
+                </SidebarGroup>
+            </div>
         </div>
     );
 };
