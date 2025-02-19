@@ -53,6 +53,7 @@ export const ChatProvider: React.FC<{ senderId: string, children: React.ReactNod
             const response = await createdInstance.get<{ messages: IMessage[] }>(
                 `/chat/messages?senderId=${senderId}&receiverId=${receiverId}`
             );
+           
             if (response.status === 200) {
                 setMessages(response.data.messages);
             }
@@ -61,6 +62,7 @@ export const ChatProvider: React.FC<{ senderId: string, children: React.ReactNod
             const response = await createdInstance.get<{ chats: Chat[] }>(
                 `/chat/user-chats?userId=${senderId}`
             );    
+            console.log(`/chat/user-chats?userId=${senderId}`)
 
             if (response.status === 200) {
                 setChats(response.data.chats);

@@ -298,7 +298,7 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                 {type === 'seller' && onDelete && (
                     <AlertDialog>
                         <AlertDialogTrigger>
-                            <Button>Eliminar do inventário {type}</Button>
+                            <Button>Eliminar do inventário</Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent className='max-w-[90%] rounded-md'>
                             <AlertDialogHeader className="px-4">

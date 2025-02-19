@@ -34,27 +34,27 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
             ? pathname.startsWith("/seller/chat/")
             : pathname === route;
     });
-
+    console.log(profile)
     if (user && profile)
         return (
             <>
                 <NotificationProvider userId={us?.uid ?? ''}>
-                    <InventoryProvider userId={us?.uid ?? ''}>
-                    <ChatProvider senderId={us?.uid ?? ''}>
-                        <div className="flex-1 h-screen p-0 flex relative">
-                            <Sidebar closeSidebar={closeSidebar} currentProfile={profile} isOpen={isOpen} />
+                    <InventoryProvider userId={profile?.companyId ?? ''}>
+                        <ChatProvider senderId={profile?.companyId ?? ''}>
+                            <div className="flex-1 h-screen p-0 flex relative">
+                                <Sidebar closeSidebar={closeSidebar} currentProfile={profile} isOpen={isOpen} />
 
-                            <div
-                                data-open={isOpen}
-                                className={`flex-1 bg-gray-50 transition-all duration-300 data-[open=true]:ml-0 md:data-[open=false]:-ml-64 md:ml-64`}
-                            >
-                                {!shouldHideHeader && (
-                                    <AppSellerHeader toggleSidebar={toggleSidebar} user={user} />
-                                )}
-                                <main className="w-full h-screen">{children}</main>
+                                <div
+                                    data-open={isOpen}
+                                    className={`flex-1 bg-gray-50 transition-all duration-300 data-[open=true]:ml-0 md:data-[open=false]:-ml-64 md:ml-64`}
+                                >
+                                    {!shouldHideHeader && (
+                                        <AppSellerHeader toggleSidebar={toggleSidebar} user={user} />
+                                    )}
+                                    <main className="w-full h-screen">{children}</main>
+                                </div>
                             </div>
-                        </div>
-                    </ChatProvider>
+                        </ChatProvider>
                     </InventoryProvider>
                 </NotificationProvider>
                 <WhatsAppFloatingButton />
