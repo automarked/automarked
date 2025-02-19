@@ -14,6 +14,7 @@ import { createdInstance } from "@/hooks/useApi";
 import { useCallback } from "react";
 import { useUser } from "@/contexts/userContext";
 import { User } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const createCollaboratorSchema = z
     .object({
@@ -46,14 +47,15 @@ const createCollaboratorSchema = z
             }),
     })
     .refine((data) => data.email === data.repeatEmail, {
-        message: "Os endereços de email devem coincidir!",
         path: ["repeatEmail"],
+        message: "Os endereços de email devem coincidir!",
     });
 
 type CreateCollaboratorSchema = z.infer<typeof createCollaboratorSchema>
 
 export default function AccountSettings() {
-    const { user, profile } = useUser()
+    const { user } = useAuth()
+    const { profile } = useUser(user?.uid ?? '')
     const showToast = (title: string, description: string) => {
         toast({
             title,
@@ -66,15 +68,15 @@ export default function AccountSettings() {
 
     const handleCreateCollaborator = useCallback(async (data: CreateCollaboratorSchema) => {
         const { repeatEmail, ...collaborator } = data
-
-        const userCreated = await createdInstance.post<{ message: string, record?: { id: string } }>('/auth/sign', {...collaborator, companyId: user?.uid, password: "123456", type: "collaborator"})
+        console.log({ companyName: profile?.companyName, companyId: profile?.userId, NIF: profile?.NIF, IBAN: profile?.NIF, alvara: profile?.alvara, background: profile?.background, bankName: profile?.bankName, certificado: profile?.certificado, description: profile?.description, ...collaborator, password: "123456", type: "collaborator" })
+        const userCreated = await createdInstance.post<{ message: string, record?: { id: string } }>('/auth/sign', { companyName: profile?.companyName, companyId: profile?.userId, NIF: profile?.NIF, IBAN: profile?.NIF, alvara: profile?.alvara, background: profile?.background, bankName: profile?.bankName, certificado: profile?.certificado, description: profile?.description, ...collaborator, birthDate: collaborator?.birthDate, password: "123456", type: "collaborator" })
         if (userCreated.status === 201) {
             showToast("Successo!", `Conta de colaborador da ${profile?.companyName} criada com successo!`)
             reset()
         } else {
             showToast("Ocorreu algum erro inesperado!", userCreated.data.message)
         }
-    }, [])
+    }, [profile])
 
     return (
         <div className="w-full p-6 space-y-6 ">

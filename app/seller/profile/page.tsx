@@ -87,6 +87,7 @@ const ProfileForm = () => {
         console.log("PROFILE", imageURL);
 
     }, [imageURL])
+    console.log(profile?.municipality)
 
     if (profile)
         return (
@@ -137,14 +138,14 @@ const ProfileForm = () => {
                         <Input
                             type="text"
                             value={profile.municipality}
-                            onChange={(e) => handleProfileChange('municipality', e.target.value)}
+                            onChange={(e) => handleProfileChange('municipality', e.target.value ?? "")}
                             className="mobile-input"
                             placeholder="Município"
                         />
                         <Input
                             type="text"
                             value={profile.province}
-                            onChange={(e) => handleProfileChange('province', e.target.value)}
+                            onChange={(e) => handleProfileChange('province', e.target.value ?? "")}
                             className="mobile-input"
                             placeholder="Província"
                         />
@@ -154,15 +155,6 @@ const ProfileForm = () => {
                         <Input
                             type="text"
                             value={profile.email}
-                            className="mobile-input"
-                            disabled
-                        />
-                    </div>
-
-                    <div className="mb-4 space-y-[24px]">
-                        <Input
-                            type="text"
-                            value={profile.NIF}
                             className="mobile-input"
                             disabled
                         />
@@ -258,7 +250,7 @@ const ProfileForm = () => {
                         )}
                     </div>
                     <br /><br />
-                    {profile.type === "seller" && (
+                    {profile.type === "seller" || profile.type === "collaborator" && (
                         <>
                             <strong className="font-bold text-[var(--black)]">Sobre a Empresa</strong>
                             <br /><br />
@@ -267,7 +259,7 @@ const ProfileForm = () => {
                                     type="text"
                                     value={profile.companyName}
                                     className="mobile-input"
-                                    disabled
+                                    disabled={profile.type === "collaborator"}
                                 />
                             </div>
 
@@ -276,7 +268,7 @@ const ProfileForm = () => {
                                     type="text"
                                     value={profile.bankName}
                                     className="mobile-input"
-                                    disabled
+                                    disabled={profile.type === "collaborator"}
                                 />
                             </div>
 
@@ -285,7 +277,7 @@ const ProfileForm = () => {
                                     type="text"
                                     value={profile.IBAN}
                                     className="mobile-input"
-                                    disabled
+                                    disabled={profile.type === "collaborator"}
                                 />
                             </div>
 
@@ -294,7 +286,7 @@ const ProfileForm = () => {
                                     type="text"
                                     value={profile.alvara}
                                     className="mobile-input"
-                                    disabled
+                                    disabled={profile.type === "collaborator"}
                                 />
                             </div>
 
@@ -303,7 +295,7 @@ const ProfileForm = () => {
                                     type="text"
                                     value={profile.certificado}
                                     className="mobile-input"
-                                    disabled
+                                    disabled={profile.type === "collaborator"}
                                 />
                             </div>
                         </>

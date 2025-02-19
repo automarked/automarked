@@ -151,8 +151,8 @@ export const useUser = (userId?: string): UserContextType & {
     formData.append("firstName", profile.firstName);
     formData.append("lastName", profile.lastName);
     formData.append("birthDate", String(profile.birthDate));
-    formData.append("municipality", profile.municipality);
-    formData.append("province", profile.province);
+    formData.append("municipality", profile.municipality ?? "");
+    formData.append("province", profile.province ?? "");
     formData.append("description", profile.description);
     formData.append("phone", profile.phone);
     formData.append("gender", profile.gender);
@@ -202,7 +202,7 @@ export const useUser = (userId?: string): UserContextType & {
         [field]: value,
       }));
     },
-    []
+    [setProfile]
   );
 
 

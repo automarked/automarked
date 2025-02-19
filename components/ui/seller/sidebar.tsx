@@ -21,6 +21,7 @@ const Sidebar: React.FC<{ currentProfile: IUser; isOpen: boolean, closeSidebar: 
     }, [unreadMessagesCount])
 
     const { imageURL } = useUser(currentProfile.userId);
+    console.log()
     return (
         <div
             data-open={isOpen}
