@@ -173,7 +173,6 @@ const LoginWithCredentials = () => {
           Pode rever a {" "}
           <a
             href="/legal/privacy-policy"
-            target="_blank"
             className="font-bold text-blue-400"
           >
             Política de Privacidade
@@ -181,7 +180,6 @@ const LoginWithCredentials = () => {
           {" "}e os{" "}
           <a
             href="/legal/terms-and-conditions"
-            target="_blank"
             className="font-bold text-blue-400"
           >
             Termos de Utilização
