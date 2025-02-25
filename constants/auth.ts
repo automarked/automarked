@@ -1,6 +1,6 @@
 export const AUTHORIZED_ADMINS = [
     {
-        email: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
+        email: "e.s.jb2u@gmail.com",
         role: 'SUPER_ADMIN',
         permissions: ['CREATE_USERS', 'MANAGE_ROLES']
     }
