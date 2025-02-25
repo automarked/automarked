@@ -228,7 +228,7 @@ const VehicleForm = () => {
     // Get the first error message from the errors object
     const firstErrorKey = Object.keys(errors)[0];
     const firstErrorMessage = errors[firstErrorKey]?.message ?? 'Campo obrigatório';
-    
+
     toast({
       title: "Erro: Impossivel submeter formulário!",
       description: firstErrorMessage,
@@ -258,7 +258,7 @@ const VehicleForm = () => {
         const errors = validationResult.error.formErrors.fieldErrors;
         const firstField = Object.keys(errors) as Array<keyof typeof errors>;
         const firstMessage = firstField.length > 0 ? errors[firstField[0]]?.[0] : "Erro de validação";
-        
+
         setIsLoading(false);
         toast({
           title: "Erro: Impossivel submeter formulário!",
@@ -278,23 +278,25 @@ const VehicleForm = () => {
       { label: 'Potência do Motor', description: `${data.enginePower} CV` },
       { label: 'Localização', description: data.location },
     ];
+
     const { transmission, enginePower, fuel, location, ...rest } = data
     addVehicle({
       ...rest,
       dealershipId: "",
-      vehicleId: "",
+      vehicleId: data.licensePlate,
       photo: data.gallery[0],
       userId: profile?.userId ?? "",
       specifications
-    }, 1);
+    }, 1, profile?.userId ?? "");
     reset()
     handleRemoveAllImages()
+
 
     setTimeout(() => {
       setIsLoading(false)
       window.location.href = "/seller/inventory/";
     }, 2000);
-  }, [user]);
+  }, [user, profile]);
 
   const formatPrice = (value: string): string => {
     const numericValue = value.replace(/\D/g, "");
@@ -826,7 +828,7 @@ const VehicleForm = () => {
         </div>
       </form>
       {isLoading && (
-        <div className="absolute inset-0 bg-black/50 flex justify-center items-center">
+        <div className="absolute inset-0 h-screen bg-black/50 flex justify-center items-center">
           <div className="bg-white rounded text-black">
             <Loader />
           </div>

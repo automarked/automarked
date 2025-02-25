@@ -9,7 +9,7 @@ interface UseInventoryResult {
     loading: boolean;
     error: string | null;
     fetchInventory: () => void;
-    addVehicle: (vehicle: Vehicle, quantity: number) => void;
+    addVehicle: (vehicle: Vehicle, quantity: number, userID: string) => void;
     updateVehicleQuantity: (vehicleId: string, quantity: number) => void;
     removeVehicle: (vehicleId: string) => void;
     totalInventoryValue: number;
@@ -63,11 +63,11 @@ export const InventoryProvider = ({ userId, children }: InventoryProviderProps) 
     }, [userId]);
 
 
-    const addVehicle = async (vehicle: Vehicle, quantity: number) => {
+    const addVehicle = async (vehicle: Vehicle, quantity: number, userID: string) => {
+        console.log(vehicle)
         try {
-            const response = await createdInstance.post<{ message: string }>("/inventory/add", { userId, vehicle, quantity });
+            const response = await createdInstance.post<{ message: string }>("/inventory/add", { userId: userID, vehicle, quantity });
             if (response.status === 200) {
-
                 showToast("Sucesso!", `Seu ${vehicle.brand} ${vehicle.model} foi adicionando com sucesso ao seu inventário!`)
                 fetchInventory();
                 fetchTotalInventoryValue();
