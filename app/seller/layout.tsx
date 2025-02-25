@@ -39,8 +39,8 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
         return (
             <>
                 <NotificationProvider userId={us?.uid ?? ''}>
-                    <InventoryProvider userId={profile?.companyId ?? ''}>
-                        <ChatProvider senderId={profile?.companyId ?? ''}>
+                    <InventoryProvider userId={profile?.userId ?? ''}>
+                        <ChatProvider senderId={profile?.userId ?? ''}>
                             <div className="flex-1 h-screen p-0 flex relative">
                                 <Sidebar closeSidebar={closeSidebar} currentProfile={profile} isOpen={isOpen} />
 

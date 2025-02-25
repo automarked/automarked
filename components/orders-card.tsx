@@ -20,6 +20,7 @@ import {
 import { createdInstance } from "@/hooks/useApi";
 import { toast } from "@/hooks/use-toast";
 import Loader from "./loader";
+import { useMaterialLayout } from "@/contexts/LayoutContext";
 
 
 interface OrdersCardProps {
@@ -30,7 +31,8 @@ interface OrdersCardProps {
 export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
     const [minimized, setMinimized] = useState<boolean>(true)
     const [state, setState] = useState<string>(sale.state)
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { setLoading } = useMaterialLayout()
+
     const [isDocExpanded, setIsDocExpanded] = useState(false);
     const router = useRouter()
     const resizeRef = useRef(null)
@@ -49,23 +51,23 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
     }
 
     const handleUpdateState = async (state: string) => {
-        setIsLoading(true)
+        setLoading(true)
 
         try {
             const response = await createdInstance.put(`/sales/${sale.saleId}/${state}`);
 
             if (response.status === 200) {
-                setIsLoading(false)
+                setLoading(false)
                 setState(state)
                 await updateSale()
                 showToast('Pedido atualizado com sucesso!', 'O estado do pedido foi atualizado com sucesso.');
             } else {
-                setIsLoading(false)
+                setLoading(false)
                 console.log(response.data)
                 showToast('Erro ao actualizar o pedido!', 'Ocorreu um erro ao actualizar o estado do pedido.');
             }
         } catch (error) {
-            setIsLoading(false)
+            setLoading(false)
             console.error('Erro ao actualizar o pedido:', error);
             showToast('Erro ao actualizar o pedido!', 'Ocorreu um erro ao actualizar o estado do pedido.');
         }
@@ -92,7 +94,7 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
                                     className="w-14 h-14 object-cover rounded-full p-2"
                                 />
                             ) : (
-                                
+
                                 <Avatar>
                                     <AvatarFallback>
                                         {sale.buyer.firstName[0]}
@@ -283,13 +285,6 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
                     )}
                 </CardFooter>
             </Card>
-            {isLoading && (
-                <div className="absolute inset-0 bg-black opacity-25 flex justify-center items-center z-40">
-                    <div className="bg-white rounded text-black">
-                        <Loader />
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

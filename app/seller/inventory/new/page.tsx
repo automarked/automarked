@@ -22,6 +22,7 @@ import { Colors } from '@/constants/colors';
 import Image from 'next/image';
 import Loader from '@/components/loader';
 import { useInventoryContext } from '@/contexts/InventoryContext';
+import { useMaterialLayout } from '@/contexts/LayoutContext';
 
 type GalleryItemProps = {
   add: (imageUrl: string[]) => void;
@@ -179,7 +180,7 @@ const VehicleForm = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [changesOnLicence, setChangesOnLicence] = useState('')
   const [error, setError] = useState<undefined | string>()
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const {setLoading} = useMaterialLayout()
 
   const {
     control,
@@ -234,12 +235,12 @@ const VehicleForm = () => {
       description: firstErrorMessage,
     });
   };
-
+  
   const handleSubmitAll = async () => {
-    setIsLoading(true);
+    setLoading(true);
 
     if (useImageValues.images.length < 4) {
-      setIsLoading(false);
+      setLoading(false);
       toast({
         title: "Carregue no mínimo 4 imagens!",
         description: "",
@@ -259,7 +260,7 @@ const VehicleForm = () => {
         const firstField = Object.keys(errors) as Array<keyof typeof errors>;
         const firstMessage = firstField.length > 0 ? errors[firstField[0]]?.[0] : "Erro de validação";
 
-        setIsLoading(false);
+        setLoading(false);
         toast({
           title: "Erro: Impossivel submeter formulário!",
           description: firstMessage !== 'Required' ? firstMessage : "Todos os campos são de preenchimento obrigatório",
@@ -293,7 +294,7 @@ const VehicleForm = () => {
 
 
     setTimeout(() => {
-      setIsLoading(false)
+      setLoading(false)
       window.location.href = "/seller/inventory/";
     }, 2000);
   }, [user, profile]);
@@ -826,14 +827,7 @@ const VehicleForm = () => {
           </Button>
           {/* )} */}
         </div>
-      </form>
-      {isLoading && (
-        <div className="absolute inset-0 h-screen bg-black/50 flex justify-center items-center">
-          <div className="bg-white rounded text-black">
-            <Loader />
-          </div>
-        </div>
-      )}
+      </form>    
     </>
   );
 };

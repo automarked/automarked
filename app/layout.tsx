@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { UserProvider } from "@/contexts/userContext";
 import { Toaster } from "@/components/ui/toaster";
 import { MaterialLayoutProvider } from "@/contexts/LayoutContext";
+import FullScreenLoading from "@/components/fullScreenLoading";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -41,6 +42,7 @@ export default function RootLayout({
               {children}
             </UserProvider>
           </AuthProvider>
+          <FullScreenLoading />
         </MaterialLayoutProvider>
         <Toaster />
       </body>
