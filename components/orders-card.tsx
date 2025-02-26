@@ -5,11 +5,22 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, CheckCircle, Maximize2, Minimize2, User, MessageSquareText } from "lucide-react";
 import Sale from "@/models/sale";
 import { saleState } from "@/utils/saleState";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { formatCurrency } from "@/scripts/format-price";
 import { FaComment } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import {
     Carousel,
     CarouselContent,
@@ -19,8 +30,9 @@ import {
 } from "@/components/ui/carousel"
 import { createdInstance } from "@/hooks/useApi";
 import { toast } from "@/hooks/use-toast";
-import Loader from "./loader";
 import { useMaterialLayout } from "@/contexts/LayoutContext";
+import { InventoryItem } from "@/models/inventory";
+import { useInventoryContext } from "@/contexts/InventoryContext";
 
 
 interface OrdersCardProps {
@@ -31,7 +43,9 @@ interface OrdersCardProps {
 export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
     const [minimized, setMinimized] = useState<boolean>(true)
     const [state, setState] = useState<string>(sale.state)
+    const [vehicleExists, setVehicleExists] = useState<boolean>(true)
     const { setLoading } = useMaterialLayout()
+    const { inventory, removeVehicle } = useInventoryContext();
 
     const [isDocExpanded, setIsDocExpanded] = useState(false);
     const router = useRouter()
@@ -49,6 +63,15 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
             setMinimized(true)
         }
     }
+
+    useEffect(() => {
+        const vehicle = inventory.some( veh => veh.vehicles.vehicleId === sale.vehicle.vehicleId);
+        setVehicleExists(vehicle)
+    }, [setVehicleExists])
+
+    const handleRemoveFromInventory = useCallback((vehicleId: string) => {
+        removeVehicle(vehicleId);
+    }, []);
 
     const handleUpdateState = async (state: string) => {
         setLoading(true)
@@ -73,8 +96,6 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
         }
 
     };
-    console.log(sale.annex)
-
 
     return (
         <div className="mb-3">
@@ -91,11 +112,11 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
                                     height={100}
                                     src={sale.buyer.photo ?? ''}
                                     alt="Imagem do usuário"
-                                    className="w-14 h-14 object-cover rounded-full p-2"
+                                    className="w-14 h-14 object-cover border-[1px] border-slate-200 rounded-full"
                                 />
                             ) : (
 
-                                <Avatar>
+                                <Avatar className="w-14 h-14">
                                     <AvatarFallback>
                                         {sale.buyer.firstName[0]}
                                         {sale.buyer.lastName?.[0]}
@@ -124,6 +145,11 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
                                         <CheckCircle className="w-4 h-4" /> {saleState[state]}
                                     </Badge>
                                 )}
+                                {state === 'completed' && (
+                                    <Badge variant="secondary" className="flex items-center justify-center gap-1">
+                                        <CheckCircle className="w-4 h-4" /> {saleState[state]}
+                                    </Badge>
+                                )}
                             </p>
                         </div>
                     </div>
@@ -147,6 +173,11 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
                                     <CheckCircle className="w-4 h-4" /> {saleState[sale.state]}
                                 </Badge>
                             )}
+                            {sale.state === 'completed' && (
+                                <Badge variant="secondary" className="flex items-center justify-center gap-1">
+                                    <CheckCircle className="w-4 h-4" /> {saleState[sale.state]}
+                                </Badge>
+                            )}
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex flex-col items-center gap-4">
@@ -156,7 +187,7 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
                                         alt={`Imagem do ${sale.vehicle.brand} ${sale.vehicle.model}`}
                                         width={500}
                                         height={300}
-                                        className="w-full h-64 object-cover"
+                                        className="w-full h-64 object-cover border-[1px] border-slate-200"
                                     />
                                 </div>
                                 <div className="flex items-center gap-4">
@@ -174,7 +205,7 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
                                                         alt={`Galeria de ${sale.vehicle.brand} ${sale.vehicle.model}`}
                                                         width={100}
                                                         height={100}
-                                                        className="w-full h-full rounded-lg object-cover"
+                                                        className="w-full h-full rounded-lg object-cover border-[1px] border-slate-200"
                                                     />
                                                 </CarouselItem>
                                             ))}
@@ -249,7 +280,7 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
                                             alt="Foto do vendedor"
                                             width={50}
                                             height={50}
-                                            className="rounded-full object-cover h-12 w-12 border-2 border-black p-0.5"
+                                            className="rounded-full object-cover border-[1px] border-slate-200 h-12 w-12 border-2 border-black p-0.5"
                                         />
                                         <div>
                                             <p className="font-semibold">{sale.buyer.firstName} {sale.buyer.firstName}</p>
@@ -278,10 +309,29 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
                         </>
                     )}
                     {sale.state === "confirmed" && (
-                        <Button onClick={() => handleUpdateState("pending")} variant="outline" className="w-full text-red-500 rounded-full max-w-72">Cancelar a confirmação</Button>
+                        <>
+                            <Button onClick={() => handleUpdateState("pending")} variant="outline" className="w-full text-red-500 rounded-full max-w-72">Cancelar a confirmação</Button>
+                            <Button onClick={() => handleUpdateState("completed")} variant="outline" className="w-full text-slate-500 rounded-full max-w-72">Venda concluída</Button>
+                        </>
                     )}
-                    {sale.state === "completed" && (
-                        <Button disabled variant="secondary" className="w-full rounded-full bg-slate-300 max-w-72">Fechado</Button>
+                    {sale.state === "completed" && vehicleExists && (
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="outline" className="w-full text-red-500 rounded-full max-w-72">Eliminar do inventário</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Tem a certeza que deseja apagar este veículo?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Esta açao não pode ser desfeita.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className="px-4 pb-4">
+                                    <AlertDialogCancel className="rounded-3xl py-4">Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction className="rounded-3xl py-4" onClick={() => handleRemoveFromInventory(sale.vehicle.vehicleId)}>Continuar</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     )}
                 </CardFooter>
             </Card>
