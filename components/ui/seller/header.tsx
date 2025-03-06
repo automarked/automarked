@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bell, Menu, MessageCircleReplyIcon, Search } from 'lucide-react';
+import { Bell, Menu, MessageCircleReplyIcon, Search, X } from 'lucide-react';
 import Image from 'next/image';
 import NavbarSeller from './navbar-seller';
 import { useUser } from '@/contexts/userContext';
@@ -11,6 +11,7 @@ import { BsChatLeftText } from "react-icons/bs";
 import { useNotificationContext } from '@/contexts/notificationContext';
 import { Badge } from '../badge';
 import { profileType } from '@/utils/profileType';
+import { useMaterialLayout } from '@/contexts/LayoutContext';
 
 const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: string }, toggleSidebar: () => void }> = ({
   user,
@@ -20,6 +21,8 @@ const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: stri
   const { profile, imageURL } = useUser(user.uid)
   const { unreadNotifications, unreadMessagesCount } = useNotificationContext()
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
+  const { isOpen } = useMaterialLayout()
+
 
   useEffect(() => {
 
@@ -70,7 +73,14 @@ const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: stri
             </div>
           )}
         </div>
-        <Menu className='cursor-pointer' size={24} onClick={() => toggleSidebar()} />
+        <div className="w-7 h-7 flex justify-center items-center">
+          {isOpen && (
+            <X className='cursor-pointer rounded-full bg-gray-200 w-full h-full p-1' onClick={() => toggleSidebar()} />
+          )}
+          {!isOpen && (
+            <Menu className='cursor-pointer' size={24} onClick={() => toggleSidebar()} />
+          )}
+        </div>
         <NavbarSeller setMenuOpen={setMenuOpen} menuOpen={menuOpen} userId={user.uid} />
       </div>
     </div>
