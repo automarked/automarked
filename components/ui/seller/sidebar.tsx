@@ -2,7 +2,7 @@
 
 import { IUser } from "@/models/user";
 import { usePathname, useRouter } from "next/navigation"; // Hook para verificar o caminho atual
-import { BarChart2, Bell, Scroll } from "lucide-react";
+import { BarChart2, Bell, Scroll, Users } from "lucide-react";
 import { FaCar, FaComment } from "react-icons/fa";
 import { useNotificationContext } from "@/contexts/notificationContext";
 import { useUser } from "@/contexts/userContext";
@@ -45,7 +45,7 @@ const Sidebar: React.FC<{ currentProfile: IUser; isOpen: boolean, closeSidebar: 
                 <SidebarItem closeSidebar={closeSidebar} icon={<BarChart2 />} label="Dashboard" link="/seller" />
                 <SidebarItem closeSidebar={closeSidebar} icon={<FaCar />} label="Inventário" link="/seller/inventory" />
                 {currentProfile.type === "seller" &&
-                    <SidebarItem closeSidebar={closeSidebar} icon={<FaCar />} label="Comerciais" link="/seller/account-settings" />
+                    <SidebarItem closeSidebar={closeSidebar} icon={<Users />} label="Comerciais" link="/seller/account-settings" />
                 }
 
                 <SidebarGroup title="Tempo Real">

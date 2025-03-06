@@ -12,6 +12,7 @@ import { useNotificationContext } from '@/contexts/notificationContext';
 import { Badge } from '../badge';
 import { profileType } from '@/utils/profileType';
 import { useMaterialLayout } from '@/contexts/LayoutContext';
+import GoBack from '@/components/goBack';
 
 const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: string }, toggleSidebar: () => void }> = ({
   user,
@@ -48,6 +49,9 @@ const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: stri
         )}
       </div>
       <div className="flex items-center space-x-4">
+        <div className="flex items-center justify-center">
+          <GoBack className='relative top-[-2px]' />
+        </div>
         {/* <div className="relative cursor-pointer" onClick={() => {
           
         }}>
@@ -56,7 +60,7 @@ const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: stri
         <div className="relative cursor-pointer" onClick={() => {
           router.push('/seller/chat');
         }}>
-          <BsChatLeftText size={22} fontWeight={800} />
+          <BsChatLeftText size={22} fontWeight={800} className='hover:text-orange-600'/>
           {unreadMessagesCount > 0 && (
             <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
               {unreadMessagesCount}
@@ -66,7 +70,7 @@ const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: stri
         <div className="relative cursor-pointer" onClick={() => {
           router.push('/seller/notifications');
         }}>
-          <Bell />
+          <Bell className='hover:text-orange-600'/>
           {unreadNotifications.length > 0 && (
             <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
               {unreadNotifications.length}
@@ -75,10 +79,10 @@ const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: stri
         </div>
         <div className="w-7 h-7 flex justify-center items-center">
           {isOpen && (
-            <X className='cursor-pointer rounded-full bg-gray-200 w-full h-full p-1' onClick={() => toggleSidebar()} />
+            <X className='cursor-pointer rounded-full bg-gray-200 hover:text-orange-600 w-full h-full p-1' onClick={() => toggleSidebar()} />
           )}
           {!isOpen && (
-            <Menu className='cursor-pointer' size={24} onClick={() => toggleSidebar()} />
+            <Menu className='cursor-pointer hover:text-orange-600' size={24} onClick={() => toggleSidebar()} />
           )}
         </div>
         <NavbarSeller setMenuOpen={setMenuOpen} menuOpen={menuOpen} userId={user.uid} />

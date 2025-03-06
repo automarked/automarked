@@ -116,11 +116,8 @@ const LoginWithCredentials = () => {
           className="w-full max-w-md py-4 mb-6 bg-black text-white rounded-full text-lg font-medium"
           disabled={isLoading}
         >
-          Entrar
+          {isLoading ? "Carregando..." : "Entrar"}
         </button>
-        {isLoading && (
-          <Loader />
-        )}
 
         {/* Separator */}
         <div className="flex items-center w-full max-w-md mb-6">
