@@ -59,6 +59,7 @@ import { Button } from '../ui/button';
 import useWishlist from '@/hooks/useWishList';
 import { InventoryItem } from '@/models/inventory';
 import { useRouter } from 'next/navigation';
+import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
 
 export function CarouselSpacing() {
     return (
@@ -90,8 +91,6 @@ export function CarouselSpacing() {
 
 const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user: { name: string, email: string, uid: string }, type: "customer" | "seller" | "collaborator" }> = ({ vehicle, user, type, onDelete }) => {
     const router = useRouter()
-    const { addVehicle } = useShoppingCart(user.uid)
-    const { actions } = useWishlist(user.uid)
     const { profile: chatWith } = useUser(vehicle.userId)
     const [isExpanded, setIsExpanded] = useState(false);
     const [image, setImage] = useState<string | null>(null);
@@ -100,15 +99,6 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
         ? vehicle.description.slice(0, 200) + '...'
         : vehicle.description;
 
-    const handleAddToWishlist = useCallback(async () => {
-        await actions.addOnWishList(vehicle)
-    }, [vehicle, actions]);
-
-    const handleAddToCart = useCallback(async () => {
-        await addVehicle(vehicle)
-        console.log('Adicionado ao carrinho');
-    }, [vehicle, addVehicle]);
-
     const handleRemoveVehicle = useCallback(async () => {
         if (onDelete && vehicle) {
             onDelete(vehicle)
@@ -116,19 +106,32 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
         }
     }, [vehicle, onDelete]);
 
-    
+
 
     return (
         <div className="flex flex-col items-center h-screen bg-white p-0 mb-32">
-
             {/* Car Image */}
-            <Image
-                src={(image || vehicle.gallery[0])}
-                alt={`Imagem do ${vehicle.brand} ${vehicle.model}`}
-                width={500}
-                height={300}
-                className="w-full h-72 object-cover"
-            />
+
+            <Dialog>
+                <DialogTrigger className="w-full h-72 relative">
+                    <Image
+                        src={(image || vehicle.gallery[0])}
+                        alt={`Imagem do ${vehicle.brand} ${vehicle.model}`}
+                        width={500}
+                        height={300}
+                        className="w-full h-full absolute inset-0 object-cover"
+                    />
+                </DialogTrigger>
+                <DialogContent className="w-full max-w-md rounded-none bg-white p-1 shadow-lg">
+                    <Image
+                        src={(image || vehicle.gallery[0])}
+                        alt={`Imagem do ${vehicle.brand} ${vehicle.model}`}
+                        width={500}
+                        height={300}
+                        className="w-full h-72 object-cover"
+                    />
+                </DialogContent>
+            </Dialog>
 
             {/* Car Details */}
             <div className="w-full max-w-2xl p-4">
@@ -159,11 +162,11 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                     opts={{
                         align: "start",
                     }}
-                    className="w-full max-w-sm z-10"
+                    className="w-full md:max-w-screen-md z-10"
                 >
                     <CarouselContent>
                         {vehicle.gallery.map((galleryImage, index) => (
-                            <CarouselItem key={index} className="md:basis-1/2 basis-1/3 cursor-pointer" onClick={() => setImage(galleryImage)}>
+                            <CarouselItem key={index} className="md:basis-2/6 md:h-max-38 max-h-28 basis-2/6 cursor-pointer" onClick={() => setImage(galleryImage)}>
                                 <Image
                                     src={galleryImage}
                                     alt={`Galeria de ${vehicle.brand} ${vehicle.model}`}
@@ -178,27 +181,6 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                     <CarouselNext className='-right-4' />
                 </Carousel>
                 <br />
-
-                {type === 'customer' && chatWith?.photo && (
-                    <div className='flex items-center justify-between w-full'>
-                        <div className="flex items-start gap-2 mb-6">
-                            <Image
-                                src={chatWith.photo}
-                                alt="Foto do vendedor"
-                                width={50}
-                                height={50}
-                                className="rounded-full"
-                            />
-                            <div>
-                                <p className="font-semibold">{chatWith.firstName} {chatWith.lastName}</p>
-                                <p className="text-gray-500">Conta Oficial</p>
-                            </div>
-                        </div>
-                        <button>
-                            <FaComment size={24} />
-                        </button>
-                    </div>
-                )}
 
                 <div className=" mb-4">
                     <div className="flex justify-between">
@@ -257,43 +239,7 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                             </DrawerContent>
                         </Drawer>
                     </div>
-                    <br />
-                    {type === "customer" && (
-                        <AlertDialog>
-                            <AlertDialogTrigger className="px-6 py-2 bg-blue-500 text-white w-full rounded">Adicionar a lista de desejos</AlertDialogTrigger>
-                            <AlertDialogContent className='max-w-[90%] rounded-md'>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Deseja adicionar <strong>{vehicle.brand} {vehicle.model} </strong>a lista de desejos?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        Esta operação pode ser desfeita ao eliminar o veículo de sua lista
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancele</AlertDialogCancel>
-                                    <AlertDialogAction onClick={handleAddToWishlist}>Adicione</AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    )}
                 </div>
-
-                {type === 'customer' && (
-                    <AlertDialog>
-                        <AlertDialogTrigger className="w-full py-2 bg-green-500 text-white rounded mt-4">Adicionar no carrinho</AlertDialogTrigger>
-                        <AlertDialogContent className='max-w-[90%] rounded-md'>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Deseja adicionar <strong>{vehicle.brand} {vehicle.model} </strong>ao seu carrinho de compras?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Esta operação pode ser desfeita ao eliminar o veículo de sua lista
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancele</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleAddToCart}>Adicione</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                )}
 
                 {type === 'seller' && onDelete && (
                     <AlertDialog>

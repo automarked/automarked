@@ -8,7 +8,6 @@ import { saleState } from "@/utils/saleState";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { formatCurrency } from "@/scripts/format-price";
-import { FaComment } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import {
     AlertDialog,
@@ -31,7 +30,6 @@ import {
 import { createdInstance } from "@/hooks/useApi";
 import { toast } from "@/hooks/use-toast";
 import { useMaterialLayout } from "@/contexts/LayoutContext";
-import { InventoryItem } from "@/models/inventory";
 import { useInventoryContext } from "@/contexts/InventoryContext";
 
 

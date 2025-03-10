@@ -29,6 +29,7 @@ export default function useWishlist(userId: string) {
     const getWishList = useCallback(async () => {
         const response = await createdInstance.get<Vehicle[]>(`/${userId}/vehicles`);
         if (response.status === 200) {
+            console.log(response.data)
             setWishList(response.data);
         }
     }, [userId]);
