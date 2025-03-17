@@ -10,10 +10,14 @@ import { useCallback, useEffect, useState } from "react";
 export default function CardDetail({ params }: { params: { id: string } }) {
     const { user } = useUser()
     const { profile } = useUser(user?.uid ?? '');
-    const { removeVehicle: deleteVehicleFromInventory } = useInventoryContext()
+    const { removeVehicle: deleteVehicleFromInventory, updateVehicle } = useInventoryContext()
 
     const onDelete = useCallback((vehicleToDelete: Vehicle) => {
         deleteVehicleFromInventory(vehicleToDelete.vehicleId);
+    }, []);
+
+    const onUpdate = useCallback((vehicleToUpdate: Vehicle) => {
+        updateVehicle(vehicleToUpdate);
     }, []);
 
     const [vehicle, setVehicle] = useState<Vehicle>()
@@ -29,7 +33,7 @@ export default function CardDetail({ params }: { params: { id: string } }) {
     if (vehicle && user)
         return (
             <>
-                <CarViewer user={user} type={profile?.type ?? "seller"} onDelete={onDelete} vehicle={vehicle} />
+                <CarViewer user={user} type={profile?.type ?? "seller"} onDelete={onDelete} onUpdate={onUpdate} vehicle={vehicle} />
             </>
         )
 }

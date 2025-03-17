@@ -19,6 +19,7 @@ import { MdManageAccounts } from "react-icons/md";
 import Sale from '@/models/sale';
 import { createdInstance } from '@/hooks/useApi';
 import { useInventoryContext } from '@/contexts/InventoryContext';
+import CustomerHelpdesk from '@/components/CustomerHelpdesk';
 
 
 const SellerDashboard = () => {
@@ -145,17 +146,17 @@ const SellerDashboard = () => {
                 </div>
                 <div className="bg-[var(--orange-dark)] rounded-lg p-4 shadow-xl mb-6">
                     <p className="text-white text-xs">
-                        Veja a evolução <strong className="font-semibold">e automação do seu negócio</strong> na AutoMarket!
+                        Veja a evolução <strong className="font-semibold">e automação do seu negócio</strong> na AutoMarked!
                     </p>
                 </div>
-                <Carousel className="w-full mb-8"
+                <Carousel className="w-full mb-8 mx-auto"
                     plugins={[
                         Autoplay({
                             delay: 2000,
                         }),
                     ]}
                 >
-                    <CarouselContent>
+                    <CarouselContent className=''>
                         {Array.from({ length: 5 }).map((_, index) => (
                             <CarouselItem key={index}>
                                 <Card className='h-[200px] overflow-hidden shadow-none'>
@@ -210,8 +211,10 @@ const SellerDashboard = () => {
                     ))}
                 </div> */}
 
-                <div className="h-32" />
+                <div className="h-20" />
             </div>
+
+            {/* <CustomerHelpdesk classNameBG='' classNameSVG=''/> */}
         </>
     );
 };

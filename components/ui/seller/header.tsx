@@ -29,7 +29,7 @@ const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: stri
 
   }, [imageURL])
   return (
-    <div className="flex justify-between items-center p-4  bg-transparent">
+    <div className="flex justify-between items-center p-4 md:bg-[#1e293b] bg-transparent">
       <div className="flex items-center space-x-2 cursor-pointer" >
         {profile && (
           <div className='flex items-center gap-2'>
@@ -39,10 +39,10 @@ const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: stri
               alt="User Avatar"
               width={150}
               height={150}
-              className="w-12 border-[var(--black)] border-2 p-0.5 h-12 object-cover rounded-full cursor-pointer"
+              className="w-12 border-[var(--black)] md:border-yellow-400 md:border-[1px] border-2 p-0.5 h-12 object-cover rounded-full cursor-pointer"
             />
-            <div>
-              <Badge variant={"outline"}>{profileType[profile.type]}</Badge><br />
+            <div className='md:text-white'>
+              <Badge variant={"outline"} className='md:text-white'>{profileType[profile.type]}</Badge><br />
               <strong>{profile.firstName} {profile.lastName}</strong>
             </div>
           </div>
@@ -50,7 +50,7 @@ const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: stri
       </div>
       <div className="flex items-center space-x-4">
         <div className="flex items-center justify-center">
-          <GoBack className='relative top-[-2px]' />
+          <GoBack className='md:hidden relative top-[-1px]' />
         </div>
         {/* <div className="relative cursor-pointer" onClick={() => {
           
@@ -60,7 +60,7 @@ const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: stri
         <div className="relative cursor-pointer" onClick={() => {
           router.push('/seller/chat');
         }}>
-          <BsChatLeftText size={22} fontWeight={800} className='hover:text-orange-600'/>
+          <BsChatLeftText size={22} fontWeight={800} className='md:text-white hover:text-orange-600'/>
           {unreadMessagesCount > 0 && (
             <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
               {unreadMessagesCount}
@@ -70,16 +70,16 @@ const AppSellerHeader: React.FC<{ user: { uid: string, name: string, email: stri
         <div className="relative cursor-pointer" onClick={() => {
           router.push('/seller/notifications');
         }}>
-          <Bell className='hover:text-orange-600'/>
+          <Bell className='md:text-white hover:text-orange-600'/>
           {unreadNotifications.length > 0 && (
             <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
               {unreadNotifications.length}
             </div>
           )}
         </div>
-        <div className="w-7 h-7 flex justify-center items-center">
+        <div className="md:text-white w-7 h-7 flex justify-center items-center">
           {isOpen && (
-            <X className='cursor-pointer rounded-full bg-gray-200 hover:text-orange-600 w-full h-full p-1' onClick={() => toggleSidebar()} />
+            <X className='cursor-pointer rounded-full bg-gray-200 md:bg-[#354867] hover:text-orange-600 w-full h-full p-1' onClick={() => toggleSidebar()} />
           )}
           {!isOpen && (
             <Menu className='cursor-pointer hover:text-orange-600' size={24} onClick={() => toggleSidebar()} />

@@ -6,6 +6,15 @@ import Image from 'next/image';
 import { FaComment } from 'react-icons/fa';
 import { Vehicle } from '@/models/vehicle';
 import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import {
     AlertDialog,
     AlertDialogAction,
     AlertDialogCancel,
@@ -60,6 +69,11 @@ import useWishlist from '@/hooks/useWishList';
 import { InventoryItem } from '@/models/inventory';
 import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
+import { formatCurrency } from '@/scripts/format-price';
 
 export function CarouselSpacing() {
     return (
@@ -89,7 +103,7 @@ export function CarouselSpacing() {
 }
 
 
-const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user: { name: string, email: string, uid: string }, type: "customer" | "seller" | "collaborator" }> = ({ vehicle, user, type, onDelete }) => {
+const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user: { name: string, email: string, uid: string }, onUpdate: (item: Vehicle) => void, type: "customer" | "seller" | "collaborator" }> = ({ vehicle, user, type, onDelete, onUpdate }) => {
     const router = useRouter()
     const { profile: chatWith } = useUser(vehicle.userId)
     const [isExpanded, setIsExpanded] = useState(false);
@@ -106,6 +120,11 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
         }
     }, [vehicle, onDelete]);
 
+    // const handleUpdateVehicle = useCallback(async () => {
+    //     if (onUpdate && vehicle) {
+    //         onUpdate(vehicle)
+    //     }
+    // }, [vehicle, onUpdate]);
 
 
     return (
@@ -185,8 +204,7 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                 <div className=" mb-4">
                     <div className="flex justify-between">
                         <div className="flex items-center gap-2">
-                            <span className="font-semibold text-gray-700">AOA</span>
-                            <span className="text-xl font-bold text-gray-900">{vehicle.price},00</span>
+                            <span className="text-xl font-bold text-gray-900">{formatCurrency(vehicle.price)}</span>
                         </div>
                         <Drawer>
                             <DrawerTrigger>Mais detalhes</DrawerTrigger>
@@ -225,8 +243,7 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                                     {/* Price and Action */}
                                     <div className="flex items-center justify-between mt-6">
                                         <div className="flex items-center gap-2">
-                                            <span className="px-1 py-0.5 text-xs font-bold bg-gray-100">AOA</span>
-                                            <p className="text-xl font-bold">{vehicle.price},00</p>
+                                            <p className="text-xl font-bold">{formatCurrency(vehicle.price)}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -242,23 +259,153 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
                 </div>
 
                 {type === 'seller' && onDelete && (
-                    <AlertDialog>
-                        <AlertDialogTrigger>
-                            <Button>Eliminar do inventário</Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className='max-w-[90%] rounded-md'>
-                            <AlertDialogHeader className="px-4">
-                                <AlertDialogTitle className="leading-6">Tem a certeza que deseja apagar este veículo?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Esta açao não pode ser desfeita.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter className="px-4 pb-4">
-                                <AlertDialogCancel className="rounded-3xl py-4">Não, cancela</AlertDialogCancel>
-                                <AlertDialogAction className="rounded-3xl py-4" onClick={handleRemoveVehicle}>Tenho</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
+                    <div className="flex justify-between">
+                        <AlertDialog>
+                            <AlertDialogTrigger>
+                                <Button>Eliminar do inventário</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className='max-w-[90%] rounded-md'>
+                                <AlertDialogHeader className="px-4">
+                                    <AlertDialogTitle className="leading-6">Tem a certeza que deseja apagar este veículo?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Esta açao não pode ser desfeita.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className="px-4 pb-4">
+                                    <AlertDialogCancel className="rounded-3xl py-4">Não, cancela</AlertDialogCancel>
+                                    <AlertDialogAction className="rounded-3xl py-4" onClick={handleRemoveVehicle}>Tenho</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+
+                        {/* <AlertDialog>
+                            <AlertDialogTrigger>
+                                <Button variant={"outline"} className='bg-transparent shadow-none px-2'>
+                                    <FontAwesomeIcon color='black' icon={faPencilAlt} />
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className='max-w-[90%] rounded-md'>
+                                <AlertDialogHeader className="px-4">
+                                    <AlertDialogTitle className="leading-6">Editar veículo</AlertDialogTitle>
+                                    <AlertDialogDescription className="mb-4 space-y-[24px]">
+                                        <Input
+                                            type="text"
+                                            value={vehicle.model}
+                                            onChange={(e) => handleVehicleChange('model', e.target.value)}
+                                            className="mobile-input"
+                                            placeholder="Marca"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={vehicle.brand}
+                                            onChange={(e) => handleVehicleChange('brand', e.target.value)}
+                                            className="mobile-input"
+                                            placeholder="Modelo"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={vehicle.color}
+                                            onChange={(e) => handleVehicleChange('color', e.target.value ?? "")}
+                                            className="mobile-input"
+                                            placeholder="Cor"
+                                        />
+                                        <Select
+                                            value={vehicle.specifications.find(spec => spec.label === 'Combustível')?.description}
+                                            onValueChange={(value) => handleVehicleChange("fuel", value as "Gasolina" | "Diesel" | "Elétrico" | "Híbrido")}
+                                        >
+                                            <SelectTrigger className="mobile-input">
+                                                <SelectValue placeholder="Selecione o tipo de 
+                                                combustível" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Fruits</SelectLabel>
+                                                    <SelectItem value="Gasolina">Gasolina</SelectItem>
+                                                    <SelectItem value="Diesel">Diesel</SelectItem>
+                                                    <SelectItem value="Elétrico">Elétrico</SelectItem>
+                                                    <SelectItem value="Híbrido">Híbrido</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        <Select
+                                            value={vehicle.specifications.find(spec => spec.label === 'Transmissão')?.description}
+                                            onValueChange={(value) => handleVehicleChange("fuel", value as "Manual" | "Automática" | "CVT")}
+                                        >
+                                            <SelectTrigger className="mobile-input">
+                                                <SelectValue placeholder="Selecione o tipo de 
+                                                combustível" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Fruits</SelectLabel>
+                                                    <SelectItem value="Manual">Manual</SelectItem>
+                                                    <SelectItem value="Automática">Automática</SelectItem>
+                                                    <SelectItem value="CVT">CVT</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        <Select
+                                            value={vehicle.specifications.find(spec => spec.label === 'Transmissão')?.description}
+                                            onValueChange={(value) => handleVehicleChange("fuel", value as "Manual" | "Automática" | "CVT")}
+                                        >
+                                            <SelectTrigger className="mobile-input">
+                                                <SelectValue placeholder="Selecione o tipo de 
+                                                combustível" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Fruits</SelectLabel>
+                                                    <SelectItem value="Manual">Manual</SelectItem>
+                                                    <SelectItem value="Automática">Automática</SelectItem>
+                                                    <SelectItem value="CVT">CVT</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        <Input
+                                            type="text"
+                                            value={vehicle.condition}
+                                            onChange={(e) => handleVehicleChange('condition', e.target.value ?? "")}
+                                            className="mobile-input"
+                                            placeholder="Condição"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={vehicle.licensePlate}
+                                            onChange={(e) => handleVehicleChange('licensePlate', e.target.value ?? "")}
+                                            className="mobile-input"
+                                            placeholder="Matrícula"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={vehicle.mileage}
+                                            onChange={(e) => handleVehicleChange('mileage', e.target.value ?? "")}
+                                            className="mobile-input"
+                                            placeholder="Quilometragem"
+                                        />
+                                        <Input
+                                            type="text"
+                                            value={vehicle.price}
+                                            onChange={(e) => handleVehicleChange('price', e.target.value ?? "")}
+                                            className="mobile-input"
+                                            placeholder="Preço"
+                                        />
+                                        <Textarea
+                                            value={vehicle.description}
+                                            onChange={(e) => handleVehicleChange('description', e.target.value ?? "")}
+                                            className="mobile-input"
+                                            placeholder="Descrição"
+                                        />
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className="px-4 pb-4">
+                                    <AlertDialogCancel className="rounded-3xl py-4">Cancela</AlertDialogCancel>
+                                    <AlertDialogAction className="rounded-3xl py-4" onClick={handleUpdateVehicle}>Salvar</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog> */}
+
+                    </div>
+
                 )}
             </div>
         </div>

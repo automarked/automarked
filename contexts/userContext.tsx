@@ -64,6 +64,7 @@ export const useUser = (userId?: string): UserContextType & {
   handleDiscardImage: (index: number) => void
   getCollaborators: () => void
   collaborators: IUser[]
+  getSupportId:  (email: string) => Promise<string | undefined>
 } => {
   const context = useContext(UserContext);
   const [collaborators, setCollaborators] = useState<IUser[]>([])
@@ -87,6 +88,25 @@ export const useUser = (userId?: string): UserContextType & {
     else setImageURL('/images/logo.png')
   }, [profile])
 
+  const getSupportId = useCallback(
+    async (email: string) => {
+      try {
+        const response = await createdInstance.post<{ message: string | null; supportId: string }>(
+          `/support/`,
+          { email }
+        );
+  
+        if (response.status === 200) {
+          return response.data.supportId;
+        } else {
+          throw new Error(`Erro ao buscar suporte: ${response.status}`);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     if (images.length > 0) {
@@ -223,6 +243,7 @@ export const useUser = (userId?: string): UserContextType & {
     handleProfileChange,
     selectImage: actions.selectImages,
     activeImagePreview,
-    handleDiscardImage
+    handleDiscardImage,
+    getSupportId
   };
 };

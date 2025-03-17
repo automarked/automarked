@@ -11,10 +11,14 @@ import { useChatContext } from "@/contexts/chatContext";
 import { useEffect } from "react";
 import { profileType } from "@/utils/profileType";
 import { Badge } from "../badge";
+import HelpDeskSVG from "@/components/helpdeskSVG";
+import useSupportId from "@/hooks/useSupportedId";
 
 const Sidebar: React.FC<{ currentProfile: IUser; isOpen: boolean, closeSidebar: () => void }> = ({ currentProfile, isOpen, closeSidebar }) => {
     const { unreadMessagesCount, unreadNotifications } = useNotificationContext();
     const { getUnreadMessagesCount, unreadMessagesCount: unreadMessagesCountContext } = useChatContext()
+    const { supportId } = useSupportId();
+
 
     useEffect(() => {
         getUnreadMessagesCount();
@@ -25,7 +29,7 @@ const Sidebar: React.FC<{ currentProfile: IUser; isOpen: boolean, closeSidebar: 
     return (
         <div
             data-open={isOpen}
-            className={`fixed top-0 z-[999] left-0 h-screen w-64 bg-[#1e293b] text-white transform transition-transform duration-300 ease-in-out data-[open=true]:translate-x-0 data-[open=false]:-translate-x-full md:translate-x-0 md:static flex flex-col`}
+            className={`fixed top-0 z-[999] left-0 buttom-0 h-screen w-64 bg-[#1e293b] text-white transform transition-transform duration-300 ease-in-out data-[open=true]:translate-x-0 data-[open=false]:-translate-x-full md:translate-x-0 md:static  flex flex-col`}
         >
             {/* Perfil do Usuário */}
             <div className="flex flex-col items-center py-6 border-b border-gray-700">

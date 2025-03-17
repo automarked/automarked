@@ -175,6 +175,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ sender, receiver }) => {
                                         <span className="absolute right-[-7px] bottom-[-8px]">{getTimeOfSentMessage(msg.createdAt)}</span>
                                     </div>
                                 </div>
+                                
                             </div>
                         );
                     })}

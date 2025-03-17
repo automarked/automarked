@@ -12,6 +12,7 @@ interface UseInventoryResult {
     addVehicle: (vehicle: Vehicle, quantity: number, userID: string) => void;
     updateVehicleQuantity: (vehicleId: string, quantity: number) => void;
     removeVehicle: (vehicleId: string) => void;
+    updateVehicle: (vehicle: Vehicle) => void;
     totalInventoryValue: number;
     fetchTotalInventoryValue: () => void;
 }
@@ -41,7 +42,7 @@ export const InventoryProvider = ({ userId, children }: InventoryProviderProps) 
 
         try {
             const response = await createdInstance.get<InventoryItem[]>(`/inventory/${userId}`);
-            setInventory(response.data);            
+            setInventory(response.data);
             setError(null);
         } catch (err: any) {
             setError(err.message);
@@ -88,6 +89,18 @@ export const InventoryProvider = ({ userId, children }: InventoryProviderProps) 
         }
     };
 
+    const updateVehicle = async (vehicle: Vehicle) => {
+        try {
+            showToast("Sucesso!", `O Veículo ${vehicle.brand} ${vehicle.model} matrícula ${vehicle.licensePlate} foi actualizado com sucesso do seu inventário!`)
+            setInventory(inventory.filter(inv => inv.vehicles.vehicleId !== vehicle.vehicleId))
+            fetchInventory();
+            fetchTotalInventoryValue();
+        } catch (err: any) {
+            showToast("Erro ao deletar!", `Não foi possivel actualizar o veículo do seu inventário!\n Por favor, aguarde e tente novamente daqui a alguns segundos, se o problema perssistir entre em contacto com a equipe técnica ou reporte o erro ao seu responsável.`)
+            setError(err.message);
+        }
+    }
+
     const removeVehicle = async (vehicleId: string) => {
         try {
             const response = await createdInstance.get<InventoryItem[]>(`/inventory/${userId}`);
@@ -128,6 +141,7 @@ export const InventoryProvider = ({ userId, children }: InventoryProviderProps) 
             addVehicle,
             updateVehicleQuantity,
             removeVehicle,
+            updateVehicle,
             totalInventoryValue,
             fetchTotalInventoryValue,
         }}>

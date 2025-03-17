@@ -158,6 +158,44 @@ const ProfileForm = () => {
                             className="mobile-input"
                             disabled
                         />
+                    </div> <div className="mb-4 space-y-[24px]">
+                        <Input
+                            type="text"
+                            value={profile.firstName}
+                            onChange={(e) => handleProfileChange('firstName', e.target.value)}
+                            className="mobile-input"
+                            placeholder="Primeiro nome"
+                        />
+                        <Input
+                            type="text"
+                            value={profile.lastName}
+                            onChange={(e) => handleProfileChange('lastName', e.target.value)}
+                            className="mobile-input"
+                            placeholder="Apelido"
+                        />
+                        <Input
+                            type="text"
+                            value={profile.municipality}
+                            onChange={(e) => handleProfileChange('municipality', e.target.value ?? "")}
+                            className="mobile-input"
+                            placeholder="Município"
+                        />
+                        <Input
+                            type="text"
+                            value={profile.province}
+                            onChange={(e) => handleProfileChange('province', e.target.value ?? "")}
+                            className="mobile-input"
+                            placeholder="Província"
+                        />
+                    </div>
+
+                    <div className="mb-4 space-y-[24px]">
+                        <Input
+                            type="text"
+                            value={profile.email}
+                            className="mobile-input"
+                            disabled
+                        />
                     </div>
 
                     <div className="flex items-center mb-4">

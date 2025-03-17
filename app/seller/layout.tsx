@@ -46,18 +46,17 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
 
                                 <div
                                     data-open={isOpen}
-                                    className={`flex-1 bg-gray-50 transition-all duration-300 data-[open=true]:ml-0 md:data-[open=false]:-ml-64 md:ml-64`}
+                                    className={`flex-1 h-screen md:h-full p-0  relative md:bg-gray-100 transition-all duration-300 data-[open=true]:ml-0 md:data-[open=false]:-ml-64 md:ml-64 overflow-y-auto md:min-h-full md:h-screen`}
                                 >
                                     {!shouldHideHeader && (
                                         <AppSellerHeader toggleSidebar={toggleSidebar} user={user} />
                                     )}
-                                    <main className="w-full h-screen">{children}</main>
+                                    <main className="w-full h-screen md:min-h-full md:h-full overflow-y-scroll max-w-[1500px] mt-0 bg-white mx-auto">{children}</main>
                                 </div>
                             </div>
                         </ChatProvider>
                     </InventoryProvider>
                 </NotificationProvider>
-                <WhatsAppFloatingButton />
             </>
         );
 }
