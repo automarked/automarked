@@ -21,7 +21,7 @@ export default function Notifications() {
     }
 
     return (
-        <div className="space-y-4 px-4">
+        <div className="space-y-4 px-4 py-2">
             <div>
                 <NotificationHeader />
             </div>

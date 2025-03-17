@@ -1,22 +1,34 @@
 import { FC, useCallback } from "react";
-import { Plus, Smile, Mic } from "lucide-react";
-import { LuSend } from "react-icons/lu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { cn } from "@/lib/utils";
 import { Textarea } from "../ui/textarea";
 import { useChatContext } from "@/contexts/chatContext";
+import { Button } from "../ui/button";
 
-const MessageInput: FC<{receiverPhoto: string}> = ({ receiverPhoto }) => {
+const MessageInput: FC<{ receiverPhoto: string, sendername: string }> = ({ receiverPhoto, sendername }) => {
     const { messages, sendMessage, setMessage, message, senderId } = useChatContext()
     const onSend = useCallback(async () => {
         if (!message.trim()) return;
         await sendMessage()
         setMessage("");
     }, [messages, sendMessage, setMessage, message]);
+
+    function restructureTimeDisplay(time: string) {
+        return time.length < 2 ? "0" + time : time
+    }
+
+    function getTimeOfSentMessage(time: Date | number) {
+        const hour = new Date(time).getHours().toString()
+        const minutes = new Date(time).getMinutes().toString()
+
+        return restructureTimeDisplay(hour) + ":" + restructureTimeDisplay(minutes)
+    }
+    
     return (
-        <>
-            <div className="w-full flex-1 h-[calc(100% - 5rem)] overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-gray-100 px-4 pt-12 space-y-4 pb-[5rem]">
-                {messages.map((msg) => {
+        <div className="flex flex-col h-full relative">
+            {/* Messages container */}
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-20">
+                {messages.map((msg, index) => {
                     const isSender = msg.user._id === senderId;
                     return (
                         <div
@@ -28,50 +40,58 @@ const MessageInput: FC<{receiverPhoto: string}> = ({ receiverPhoto }) => {
                         >
                             {!isSender && (
                                 <Avatar>
-                                    <AvatarImage src={receiverPhoto} className="object-cover" alt="Receiver Avatar" />
+                                    <AvatarImage src={receiverPhoto} className="object-cover" alt="Foto do usuário" />
                                     <AvatarFallback>
-                                        Receiver
+                                        {sendername.split(' ')[0][0]}
+                                        {sendername.split(' ')[1]?.[0]}
                                     </AvatarFallback>
                                 </Avatar>
                             )}
                             <div
                                 className={cn(
-                                    "p-3 rounded-lg text-sm",
+                                    "py-3 px-4 rounded-lg text-sm flex",
                                     isSender
-                                        ? "bg-blue-600 text-white rounded-tr-none"
-                                        : "bg-gray-200 text-gray-900 rounded-tl-none"
+                                        ? "bg-gradient-to-r from-[#101010] to-[#313130] text-white rounded-tr-none"
+                                        : "bg-gray-200 text-gray-900 rounded-tl-none",
+                                        index === (messages.length - 1) && "mb-10"
                                 )}
                             >
-                                {msg.text}
+                            <span>{msg.text}</span>
+                            <div className="time text-[.6rem] ms-4 p-2 relative">
+                                <span className="absolute right-[-7px] bottom-[-8px]">{getTimeOfSentMessage(msg.createdAt)}</span>
+                            </div>
                             </div>
                         </div>
                     );
                 })}
             </div>
-            <div className="flex items-center gap-2 px-4 py-4 pb-24 bg-gray-100 rounded-lg shadow-md">
-                {/* Botão de Adicionar */}
-                <button className="p-2 rounded-full hover:bg-gray-200">
-                    <Plus size={20} className="text-gray-500" />
-                </button>
 
-                {/* Campo de Texto */}
-                <div className="flex-1 flex items-center bg-white rounded-lg px-4 py-2 shadow-inner border border-gray-200">
-                    <Smile size={28} className="text-gray-400 mr-2" />
+            {/* Send message - fixed at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-2">
+                <div className="flex items-center px-4 py-2">
                     <Textarea
                         value={message}
-                        cols={4}
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Escrever mensagem"
-                        className="w-full text-sm text-gray-700 bg-transparent outline-none"
+                        onChange={(e) => {
+                            setMessage(e.target.value);
+                            // Auto-resize
+                            e.target.style.height = 'inherit';
+                            e.target.style.height = `${Math.min(e.target.scrollHeight, 112)}px`;
+                        }}
+                        placeholder="Digite sua mensagem..."
+                        className="flex-1 text-sm text-slate-700 bg-[#E7E9F0] border-none outline-none min-h-14 max-h-28 resize-none"
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                onSend();
+                            }
+                        }}
                     />
+                    <Button onClick={onSend} className="ml-2">
+                        Enviar
+                    </Button>
                 </div>
-
-                {/* Botão do Microfone */}
-                <button onClick={onSend} className="p-2 rounded-full w-12 h-12 flex justify-center items-center hover:bg-gray-200">
-                    <LuSend size={20} className="text-gray-500" />
-                </button>
             </div>
-        </>
+        </div>
     );
 };
 

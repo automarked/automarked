@@ -29,18 +29,21 @@ const PersonalChat = () => {
 
 
     return (
-        <div className="flex mx-auto">
-            <ChatSidebar setChat={setSelectedChat} chats={chats} user={user} />
-            <div className="hidden md:flex flex-1 h-full">
-                <div className="flex-1 flex flex-col h-screen relative">
-                    {selectedChat && (
+        <div className="flex h-screen w-full overflow-hidden">
+            <div className="h-full md:w-96 w-full">
+                <ChatSidebar setChat={setSelectedChat} chats={chats} user={user} />
+            </div>
+            <div className="hidden md:block flex-1 h-full">
+                <div className="flex flex-col h-full">
+                    {selectedChat ? (
                         <>
                             <ChatHeader {...selectedChat} />
-                            <MessageInput receiverPhoto={selectedChat.chatWith.photo} />
+                            <div className="flex-1 overflow-hidden">
+                                <MessageInput receiverPhoto={selectedChat.chatWith.photo} sendername={selectedChat.chatWith.name} />
+                            </div>
                         </>
-                    )}
-                    {!selectedChat && (
-                        <div className="w-full h-full flex-1 flex flex-col justify-center gap-4 items-center">
+                    ) : (
+                        <div className="w-full h-full flex flex-col justify-center gap-4 items-center">
                             <small className="text-gray-400 text-center">Suas mensagens aparecerão aqui quando clicar em uma conversa!</small>
                             <Image
                                 src="/images/no-message.png"

@@ -32,7 +32,7 @@ export function NotificationHeader() {
 
   return (
     <div className="flex items-center justify-between pb-2 border-b">
-      <h2 className="text-lg font-semibold">Notificações</h2>
+      <h2 className="text-lg font-semibold my-4">Notificações</h2>
       <div className="flex items-center space-x-2">
         {/* <button>
           <Check className="w-5 h-5" />

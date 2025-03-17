@@ -91,7 +91,7 @@ const ProfileForm = () => {
 
     if (profile)
         return (
-            <ScrollArea className="p-2 space-y-4 h-screen">
+            <ScrollArea className="container mx-auto p-6 w-full max-w-2xl">
                 <div className="container mx-auto p-6">
                     <div className="flex flex-col items-center justify-center mb-8">
                         <div className="relative flex items-center gap-2 flex-col">
@@ -125,28 +125,28 @@ const ProfileForm = () => {
                             type="text"
                             value={profile.firstName}
                             onChange={(e) => handleProfileChange('firstName', e.target.value)}
-                            className="mobile-input"
+                            className="border-[1px] border-gray-200 px-4 py-6"
                             placeholder="Primeiro nome"
                         />
                         <Input
                             type="text"
                             value={profile.lastName}
                             onChange={(e) => handleProfileChange('lastName', e.target.value)}
-                            className="mobile-input"
+                            className="border-[1px] border-gray-200 px-4 py-6"
                             placeholder="Apelido"
                         />
                         <Input
                             type="text"
                             value={profile.municipality}
                             onChange={(e) => handleProfileChange('municipality', e.target.value ?? "")}
-                            className="mobile-input"
+                            className="border-[1px] border-gray-200 px-4 py-6"
                             placeholder="Município"
                         />
                         <Input
                             type="text"
                             value={profile.province}
                             onChange={(e) => handleProfileChange('province', e.target.value ?? "")}
-                            className="mobile-input"
+                            className="border-[1px] border-gray-200 px-4 py-6"
                             placeholder="Província"
                         />
                     </div>
@@ -155,7 +155,7 @@ const ProfileForm = () => {
                         <Input
                             type="text"
                             value={profile.email}
-                            className="mobile-input"
+                            className="border-[1px] border-gray-200 px-4 py-6"
                             disabled
                         />
                     </div> <div className="mb-4 space-y-[24px]">
@@ -163,28 +163,28 @@ const ProfileForm = () => {
                             type="text"
                             value={profile.firstName}
                             onChange={(e) => handleProfileChange('firstName', e.target.value)}
-                            className="mobile-input"
+                            className="border-[1px] border-gray-200 px-4 py-6"
                             placeholder="Primeiro nome"
                         />
                         <Input
                             type="text"
                             value={profile.lastName}
                             onChange={(e) => handleProfileChange('lastName', e.target.value)}
-                            className="mobile-input"
+                            className="border-[1px] border-gray-200 px-4 py-6"
                             placeholder="Apelido"
                         />
                         <Input
                             type="text"
                             value={profile.municipality}
                             onChange={(e) => handleProfileChange('municipality', e.target.value ?? "")}
-                            className="mobile-input"
+                            className="border-[1px] border-gray-200 px-4 py-6"
                             placeholder="Município"
                         />
                         <Input
                             type="text"
                             value={profile.province}
                             onChange={(e) => handleProfileChange('province', e.target.value ?? "")}
-                            className="mobile-input"
+                            className="border-[1px] border-gray-200 px-4 py-6"
                             placeholder="Província"
                         />
                     </div>
@@ -193,7 +193,7 @@ const ProfileForm = () => {
                         <Input
                             type="text"
                             value={profile.email}
-                            className="mobile-input"
+                            className="border-[1px] border-gray-200 px-4 py-6"
                             disabled
                         />
                     </div>
@@ -215,7 +215,7 @@ const ProfileForm = () => {
                             type="text"
                             value={profile.phone}
                             onChange={(e) => handleProfileChange('phone', e.target.value)}
-                            className="mobile-input"
+                            className="border-[1px] border-gray-200 px-4 py-6"
                             placeholder="Número de telefone"
                         />
                     </div>
@@ -233,7 +233,7 @@ const ProfileForm = () => {
                         <Textarea
                             value={profile.description}
                             onChange={(e) => handleProfileChange('description', e.target.value)}
-                            className="mobile-input"
+                            className="border-[1px] border-gray-200 px-4 py-6"
                             placeholder="Decrição do seu perfil"
                         />
                     </div>
@@ -296,7 +296,7 @@ const ProfileForm = () => {
                                 <Input
                                     type="text"
                                     value={profile.companyName}
-                                    className="mobile-input"
+                                    className="border-[1px] border-gray-200 px-4 py-6"
                                     disabled={profile.type === "collaborator"}
                                 />
                             </div>
@@ -305,7 +305,7 @@ const ProfileForm = () => {
                                 <Input
                                     type="text"
                                     value={profile.bankName}
-                                    className="mobile-input"
+                                    className="border-[1px] border-gray-200 px-4 py-6"
                                     disabled={profile.type === "collaborator"}
                                 />
                             </div>
@@ -314,7 +314,7 @@ const ProfileForm = () => {
                                 <Input
                                     type="text"
                                     value={profile.IBAN}
-                                    className="mobile-input"
+                                    className="border-[1px] border-gray-200 px-4 py-6"
                                     disabled={profile.type === "collaborator"}
                                 />
                             </div>
@@ -323,7 +323,7 @@ const ProfileForm = () => {
                                 <Input
                                     type="text"
                                     value={profile.alvara}
-                                    className="mobile-input"
+                                    className="border-[1px] border-gray-200 px-4 py-6"
                                     disabled={profile.type === "collaborator"}
                                 />
                             </div>
@@ -332,7 +332,7 @@ const ProfileForm = () => {
                                 <Input
                                     type="text"
                                     value={profile.certificado}
-                                    className="mobile-input"
+                                    className="border-[1px] border-gray-200 px-4 py-6"
                                     disabled={profile.type === "collaborator"}
                                 />
                             </div>
