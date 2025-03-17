@@ -35,7 +35,8 @@ const MessageInput: FC<{ receiverPhoto: string, sendername: string }> = ({ recei
                             key={msg._id}
                             className={cn(
                                 "flex items-center space-x-3 max-w-lg mb-4",
-                                isSender ? "ml-auto justify-end" : "mr-auto"
+                                isSender ? "ml-auto justify-end" : "mr-auto",
+                                        index === (messages.length - 1) && "mb-10"
                             )}
                         >
                             {!isSender && (
@@ -52,8 +53,7 @@ const MessageInput: FC<{ receiverPhoto: string, sendername: string }> = ({ recei
                                     "py-3 px-4 rounded-lg text-sm flex",
                                     isSender
                                         ? "bg-gradient-to-r from-[#101010] to-[#313130] text-white rounded-tr-none"
-                                        : "bg-gray-200 text-gray-900 rounded-tl-none",
-                                        index === (messages.length - 1) && "mb-10"
+                                        : "bg-gray-200 text-gray-900 rounded-tl-none"
                                 )}
                             >
                             <span>{msg.text}</span>

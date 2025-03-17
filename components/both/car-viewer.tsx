@@ -132,7 +132,7 @@ const CarViewer: FC<{ onDelete?: (item: Vehicle) => void, vehicle: Vehicle, user
             {/* Car Image */}
 
             <Dialog>
-                <DialogTrigger className="w-full h-72 relative">
+                <DialogTrigger className="w-full max-w-2xl md:px-4 h-72 relative">
                     <Image
                         src={(image || vehicle.gallery[0])}
                         alt={`Imagem do ${vehicle.brand} ${vehicle.model}`}

@@ -39,7 +39,7 @@ export default function Orders() {
                     <TabsTrigger value="confirmed">Confirmados</TabsTrigger>
                     <TabsTrigger value="completed">Fechados</TabsTrigger>
                 </TabsList>
-                <div className="flex flex-col items-center space-y-4 w-full max-w-[430px] px-2 min-h-28">
+                <div className="flex flex-col md:flex-row items-center space-y-4 w-full md:max-w-5xl px-2 min-h-28">
                     <TabsContent value="pending" className="w-full text-center min-h-28">
                         {sales.map((sale) => (
                             sale.state === "pending" && (

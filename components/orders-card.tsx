@@ -55,6 +55,7 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
     const [isDesktop, setIsDesktop] = useState<boolean>(false);
     const { setLoading } = useMaterialLayout();
     const { inventory, removeVehicle } = useInventoryContext();
+    const [image, setImage] = useState<string | null>(null);
 
     const [isDocExpanded, setIsDocExpanded] = useState(false);
     const router = useRouter();
@@ -131,7 +132,7 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
             <div className="flex flex-col items-center gap-4">
                 <div className="">
                     <Image
-                        src={sale.vehicle.gallery[0] ?? ''}
+                        src={(sale.vehicle?.gallery?.length ? sale.vehicle.gallery[0] : image ?? "")}
                         alt={`Imagem do ${sale.vehicle.brand} ${sale.vehicle.model}`}
                         width={500}
                         height={300}
@@ -147,7 +148,7 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
                     >
                         <CarouselContent>
                             {sale.vehicle.gallery.map((galleryImage, index) => (
-                                <CarouselItem key={index} className="md:basis-1/6 basis-1/3 cursor-pointer">
+                                <CarouselItem key={index} onClick={() => setImage(galleryImage)} className="md:basis-1/6 basis-1/3 cursor-pointer">
                                     <Image
                                         src={galleryImage}
                                         alt={`Galeria de ${sale.vehicle.brand} ${sale.vehicle.model}`}
@@ -183,42 +184,44 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
                 </div>
             </div>
             <div className="grid grid-cols-2 gap-4 text-start py-4">
-                <div className="col-span-2">
-                    <p className="text-sm font-medium mb-2">Documento de identidade</p>
-                    <div className={`w-full flex justify-center ${isDocExpanded ? 'fixed inset-0 bg-black bg-opacity-50 z-50 p-4' : ''}`}>
-                        <div className={`relative ${isDocExpanded ? 'w-full h-full flex items-center justify-center' : ''}`}>
-                            {sale.annex.includes('drive.google.com') || sale.annex.toLowerCase().match(/\.(jpg|jpeg|png|gif|bmp|webp)$/) ? (
-                                <div className="relative h-fit" onClick={() => setIsDocExpanded(true)}>
-                                    <Image
-                                        width={500}
-                                        height={300}
-                                        src={sale.annex}
-                                        alt="Documento de identidade"
-                                        className={`${isDocExpanded ? 'w-auto h-auto max-h-[90vh] max-w-[90vw]' : 'w-full max-w-xl h-52'} object-contain rounded border-[1px] cursor-pointer`}
-                                    />
-                                </div>
-                            ) : sale.annex.toLowerCase().endsWith('.pdf') ? (
-                                <div className="relative w-full max-w-xl" onClick={() => setIsDocExpanded(true)}>
-                                    <iframe
-                                        src={`https://drive.google.com/viewerng/viewer?embedded=true&url=${encodeURIComponent(sale.annex)}`}
-                                        title="PDF Preview"
-                                        className={`${isDocExpanded ? 'w-[90vw] h-[90vh]' : 'w-full h-52'} border rounded cursor-pointer`}
-                                    />
-                                </div>
-                            ) : (
-                                <div className="text-red-500">Formato de arquivo não suportado</div>
-                            )}
-                            {isDocExpanded && (
-                                <button
-                                    onClick={() => setIsDocExpanded(false)}
-                                    className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
-                                >
-                                    <Minimize2 className="w-6 h-6" />
-                                </button>
-                            )}
+                {sale.annex && (
+                    <div className="col-span-2">
+                        <p className="text-sm font-medium mb-2">Documento de Identidade</p>
+                        <div className={`w-full flex justify-center ${isDocExpanded ? 'fixed inset-0 bg-black bg-opacity-50 z-50 p-4' : ''}`}>
+                            <div className={`relative ${isDocExpanded ? 'w-full h-full flex items-center justify-center' : ''}`}>
+                                {sale.annex.includes('drive.google.com') || sale.annex.toLowerCase().match(/\.(jpg|jpeg|png|gif|bmp|webp)$/) ? (
+                                    <div className="relative h-fit" onClick={() => setIsDocExpanded(true)}>
+                                        <Image
+                                            width={500}
+                                            height={300}
+                                            src={sale.annex}
+                                            alt="Documento de identidade"
+                                            className={`${isDocExpanded ? 'w-auto h-auto max-h-[90vh] max-w-[90vw]' : 'w-full max-w-xl h-52'} object-contain rounded border-[1px] cursor-pointer`}
+                                        />
+                                    </div>
+                                ) : sale.annex.toLowerCase().endsWith('.pdf') ? (
+                                    <div className="relative w-full max-w-xl" onClick={() => setIsDocExpanded(true)}>
+                                        <iframe
+                                            src={`https://drive.google.com/viewerng/viewer?embedded=true&url=${encodeURIComponent(sale.annex)}`}
+                                            title="PDF Preview"
+                                            className={`${isDocExpanded ? 'w-[90vw] h-[90vh]' : 'w-full h-52'} border rounded cursor-pointer`}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="text-red-500">Formato de arquivo não suportado</div>
+                                )}
+                                {isDocExpanded && (
+                                    <button
+                                        onClick={() => setIsDocExpanded(false)}
+                                        className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                                    >
+                                        <Minimize2 className="w-6 h-6" />
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
             <div className="flex items-center gap-4">
                 <div onClick={() => {
@@ -297,15 +300,15 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
     return (
         <div className="mb-3">
             {/* Main Card */}
-            <Card ref={resizeRef} className={`min-w-[300px] grow w-full border rounded-lg shadow-md relative shadow-sm ${!isDesktop && !minimized ? 'absolute left-0 right-0 buttom-0 top-0 h-screen w-full overflow-y-auto z-20' : ''}`}>
-                <div onClick={handleToggleResize} className="absolute right-3 top-3 bg-slate-100 hover:bg-slate-200 px-2 rounded cursor-pointer">
+            <Card ref={resizeRef} className={`min-w-[300px] md:flex md:items-center md:space-y-5 md:justify-between grow w-full border rounded-lg shadow-md relative shadow-sm ${!isDesktop && !minimized ? 'absolute left-0 right-0 buttom-0 top-0 h-screen w-full overflow-y-auto z-20' : ''}`}>
+                <div onClick={handleToggleResize} className="absolute right-3 top-3 md:top-1 md:right-1 bg-slate-100 hover:bg-slate-200 px-2 rounded cursor-pointer">
                     {minimized || isDesktop ? <Maximize2 width={9} /> : <Minimize2 width={9} />}
                 </div>
 
                 {/* Minimized view (always shown for mobile, or when minimized for desktop) */}
                 {(minimized || isDesktop) && (
-                    <div className="flex p-3 items-center mt-6">
-                        <div className="flex items-center space-x-2">
+                    <div className="flex p-3 items-center mt-6 md:mt-0">
+                        <div onClick={() => { if (isDesktop) handleToggleResize(); }} className="flex items-center space-x-2 md:cursor-pointer">
                             {sale.buyer.photo ? (
                                 <Image
                                     width={100}
@@ -328,7 +331,7 @@ export default function OrderCard({ sale, updateSale }: OrdersCardProps) {
                             </div>
                         </div>
                         <div className="flex grow justify-end">
-                            <p className="">
+                            <p className="md:ms-4">
                                 {state === 'pending' && (
                                     <Badge variant="pending" className="flex items-center gap-1">
                                         <CheckCircle className="w-4 h-4" /> {saleState[state]}
