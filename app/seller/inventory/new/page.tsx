@@ -820,7 +820,7 @@ const VehicleForm = () => {
           {sections[2]}
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex justify-center">
 
           <Button type="button" onClick={handleSubmitAll} className="w-full max-w-md py-6 mb-6 bg-[var(--black)] text-white rounded-full text-lg font-medium">
             Cadastrar veículo
