@@ -46,7 +46,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
 
                                 <div
                                     data-open={isOpen}
-                                    className={`flex-1 h-screen md:h-full p-0  relative md:bg-gray-100 transition-all duration-300 data-[open=true]:ml-0 md:data-[open=false]:-ml-64 md:ml-64 overflow-y-auto md:min-h-full md:h-screen`}
+                                    className={`flex-1 transition-all duration-300 data-[open=true]:ml-0 md:data-[open=false]:-ml-64 md:ml-64 md:min-h-full md:h-screen overflow-y-scroll`}
                                 >
                                     {!shouldHideHeader && (
                                         <AppSellerHeader toggleSidebar={toggleSidebar} user={user} />

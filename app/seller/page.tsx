@@ -141,7 +141,7 @@ const SellerDashboard = () => {
 
     return (
         <>
-            <div className="p-2 md:p-6 pb-32 pt-0 h-screen">
+            <div className="p-2 md:p-6 mb-32 pt-0 min-h-screen h-full ">
                 <div className='w-full flex md:hidden mb-4'>
                     <SearchInput setValue={setInput} value={input} />
                 </div>
@@ -203,18 +203,13 @@ const SellerDashboard = () => {
                             icon={<MdManageAccounts className="w-6 h-6 text-white" />}
                         />
                     </div>
-                )}
-                {/* <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {stats.map((stat, index) => (
-                        <LineChartCard />
-                    ))}
-                </div> */}
+                )}   
 
                 <div className="h-20" />
             </div>
 
-            <CustomerHelpdesk classNameBG='' classNameSVG='' />
             <WhatsAppFloatingButton />
+            <CustomerHelpdesk classNameBG='' classNameSVG='' />
         </>
     );
 };

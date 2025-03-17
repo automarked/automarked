@@ -79,7 +79,7 @@ export default function AccountSettings() {
     }, [profile])
 
     return (
-        <div className="w-full p-6 space-y-6 ">
+        <div className="w-full max-w-4xl p-6 space-y-6 mx-auto">
             <h2 className="text-2xl font-bold helvetica-sans-serif">Contas associadas</h2>
             <div className="flex flex-col">
                 {/* Header */}

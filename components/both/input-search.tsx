@@ -3,7 +3,7 @@ import React from "react";
 
 const SearchInput: React.FC<{ dark?: boolean, value: string, setValue: (tag: string) => void }> = ({ setValue, value, dark }) => {
   return (
-    <div data-dark={dark} className="flex items-center justify-between bg-white data-[dark=true]:bg-[var(--input)] rounded-lg p-3 w-full">
+    <div data-dark={dark} className="flex items-center justify-between bg-gray-100 data-[dark=true]:bg-[var(--input)] rounded-lg p-3 w-full">
       {/* Input com ícone de lupa */}
       <div className="flex items-center  gap-2 w-full">
         <Search className="w-5 h-5 text-gray-400" />
@@ -15,29 +15,6 @@ const SearchInput: React.FC<{ dark?: boolean, value: string, setValue: (tag: str
           onChange={(e) => setValue(e.target.value)}
         />
       </div>
-
-      {/* Ícone de configurações */}
-      <button className="flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-sm hover:bg-gray-200 transition">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="w-5 h-5 text-gray-600"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 3c2.755 0 5 2.245 5 5s-2.245 5-5 5-5-2.245-5-5 2.245-5 5-5z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M19.5 19.5l-4.035-4.035"
-          />
-        </svg>
-      </button>
     </div>
   );
 };
