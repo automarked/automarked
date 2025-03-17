@@ -20,6 +20,7 @@ import Sale from '@/models/sale';
 import { createdInstance } from '@/hooks/useApi';
 import { useInventoryContext } from '@/contexts/InventoryContext';
 import CustomerHelpdesk from '@/components/CustomerHelpdesk';
+import WhatsAppFloatingButton from '@/components/both/contact-support';
 
 
 const SellerDashboard = () => {
@@ -156,16 +157,14 @@ const SellerDashboard = () => {
                         }),
                     ]}
                 >
-                    <CarouselContent className=''>
+                    <CarouselContent>
                         {Array.from({ length: 5 }).map((_, index) => (
                             <CarouselItem key={index}>
-                                <Card className='h-[200px] overflow-hidden shadow-none'>
+                                <Card className='h-[200px] md:h-[350px] relative overflow-hidden shadow-none'>
                                     {index % 2 !== 0 && (
-
                                         <img src="/images/banner1.jpeg" className='w-full h-full object-cover' />
                                     )}
                                     {index % 2 === 0 && (
-
                                         <img src="/images/banner2.jpeg" className='w-full h-full object-cover' />
                                     )}
                                 </Card>
@@ -214,7 +213,8 @@ const SellerDashboard = () => {
                 <div className="h-20" />
             </div>
 
-            {/* <CustomerHelpdesk classNameBG='' classNameSVG=''/> */}
+            <CustomerHelpdesk classNameBG='' classNameSVG='' />
+            <WhatsAppFloatingButton />
         </>
     );
 };

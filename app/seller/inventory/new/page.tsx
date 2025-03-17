@@ -335,7 +335,7 @@ const VehicleForm = () => {
                   setValue("brand", value);
                 }}
               >
-                <SelectTrigger className="w-full mobile-input">
+                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
                   <SelectValue placeholder="Selecione a marca" />
                 </SelectTrigger>
                 <SelectContent>
@@ -367,7 +367,7 @@ const VehicleForm = () => {
 
                 onValueChange={(value) => setValue("model", value)}
               >
-                <SelectTrigger className="w-full mobile-input">
+                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
                   <SelectValue placeholder="Selecione o modelo" />
                 </SelectTrigger>
                 <SelectContent>
@@ -394,7 +394,7 @@ const VehicleForm = () => {
                 value={field.value}
                 onValueChange={(value) => setValue("condition", value === "Novo" ? "Novo" : "Usado")}
               >
-                <SelectTrigger className="w-full mobile-input">
+                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
                   <SelectValue placeholder="Selecione a condição" />
                 </SelectTrigger>
                 <SelectContent>
@@ -417,7 +417,7 @@ const VehicleForm = () => {
             control={control}
             render={({ field }) => (
               <Input
-                className="mobile-input"
+                className="border-[1px] border-slate-100 py-6 px-4"
                 {...field}
                 placeholder="Digite a matrícula"
 
@@ -448,7 +448,7 @@ const VehicleForm = () => {
             control={control}
             render={({ field }) => (
               <Input
-                className='mobile-input'
+                className='border-[1px] border-slate-100 py-6 px-4'
                 {...field}
                 placeholder="Digite o ano de fabricação"
 
@@ -471,7 +471,7 @@ const VehicleForm = () => {
             control={control}
             render={({ field }) => (
               <Input
-                className="mobile-input"
+                className="border-[1px] border-slate-100 py-6 px-4"
                 placeholder="Digite o preço"
 
                 value={value}
@@ -515,7 +515,7 @@ const VehicleForm = () => {
                 value={field.value}
                 onValueChange={(value) => setValue("vehicleType", value === "car" ? "car" : "moto")}
               >
-                <SelectTrigger className="w-full mobile-input">
+                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
                   <SelectValue placeholder="Selecione o tipo de veículo" />
                 </SelectTrigger>
                 <SelectContent>
@@ -570,7 +570,7 @@ const VehicleForm = () => {
               return (
                 <div className="relative">
                   <Input
-                    className="mobile-input pr-16"
+                    className="border-[1px] border-slate-100 py-6 px-4 pr-16"
                     value={formatMileage(field.value)}
                     placeholder="0,00"
                     onChange={handleInputChange}
@@ -597,7 +597,7 @@ const VehicleForm = () => {
                 onValueChange={(value) => setValue("color", value)}
 
               >
-                <SelectTrigger className="w-full mobile-input">
+                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
                   <SelectValue placeholder="Selecione a cor" />
                 </SelectTrigger>
                 <SelectContent>
@@ -629,7 +629,7 @@ const VehicleForm = () => {
             control={control}
             render={({ field }) => (
               <Input
-                className='mobile-input'
+                className='border-[1px] border-slate-100 py-6 px-4'
                 {...field}
                 placeholder="Digite o código de barras"
 
@@ -655,7 +655,7 @@ const VehicleForm = () => {
                 onValueChange={(value) => setValue("fuel", value as "Gasolina" | "Diesel" | "Elétrico" | "Híbrido")}
 
               >
-                <SelectTrigger className="w-full mobile-input">
+                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
                   <SelectValue placeholder="Selecione o tipo de combustível" />
                 </SelectTrigger>
                 <SelectContent>
@@ -681,7 +681,7 @@ const VehicleForm = () => {
                 onValueChange={(value) => setValue("transmission", value as "Manual" | "Automática" | "CVT")}
 
               >
-                <SelectTrigger className="w-full mobile-input">
+                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
                   <SelectValue placeholder="Selecione o tipo de transmissão" />
                 </SelectTrigger>
                 <SelectContent>
@@ -702,7 +702,7 @@ const VehicleForm = () => {
             control={control}
             render={({ field }) => (
               <Input
-                className="mobile-input"
+                className="border-[1px] border-slate-100 py-6 px-4"
                 {...field}
                 placeholder="Digite a potência do motor"
 
@@ -719,7 +719,7 @@ const VehicleForm = () => {
             control={control}
             render={({ field }) => (
               <Input
-                className="mobile-input"
+                className="border-[1px] border-slate-100 py-6 px-4"
                 {...field}
                 placeholder="Digite a localização"
 
@@ -737,7 +737,7 @@ const VehicleForm = () => {
             control={control}
             render={({ field }) => (
               <Input
-                className='mobile-input'
+                className='border-[1px] border-slate-100 py-6 px-4'
                 {...field}
                 placeholder="Digite o código interno"
               />
@@ -756,7 +756,7 @@ const VehicleForm = () => {
             control={control}
             render={({ field }) => (
               <Textarea
-                className='mobile-input'
+                className='border-[1px] border-slate-100 py-6 px-4'
                 {...field}
                 placeholder="Digite uma descrição"
 
@@ -805,7 +805,7 @@ const VehicleForm = () => {
     <>
       <form
         onSubmit={handleSubmit(onSubmit, onError)}
-        className="space-y-8 max-w-4xl mx-auto p-4 mb-24"
+        className="space-y-8 max-w-2xl mx-auto p-4 mb-24"
       >
         <h2 className="text-2xl text-center font-semibold">Adicionar novo veículo</h2>
 
