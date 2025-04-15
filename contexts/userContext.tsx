@@ -170,6 +170,7 @@ export const useUser = (userId?: string): UserContextType & {
     const formData = new FormData();
     formData.append("firstName", profile.firstName);
     formData.append("lastName", profile.lastName);
+    formData.append("companyName", profile.companyName ?? "");
     formData.append("birthDate", String(profile.birthDate));
     formData.append("municipality", profile.municipality ?? "");
     formData.append("province", profile.province ?? "");

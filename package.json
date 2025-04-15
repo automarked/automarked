@@ -43,6 +43,7 @@
     "date-fns": "^4.1.0",
     "embla-carousel-autoplay": "^8.5.1",
     "embla-carousel-react": "^8.5.1",
+    "i": "^0.3.7",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.460.0",
     "moment-timezone": "^0.5.47",

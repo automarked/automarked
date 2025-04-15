@@ -1,16 +1,20 @@
-'use client'
+"use client";
 
 import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
-import { faEye, faEyeSlash, faAddressCard } from "@fortawesome/free-regular-svg-icons";
+import {
+  faEye,
+  faEyeSlash,
+  faAddressCard,
+} from "@fortawesome/free-regular-svg-icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import Link from "next/link";
 import Loader from "@/components/loader";
-import Cookies from 'js-cookie'
+import Cookies from "js-cookie";
 import { Badge } from "@/components/ui/badge";
 
 const LoginWithCredentials = () => {
@@ -27,33 +31,36 @@ const LoginWithCredentials = () => {
     });
   };
 
-
   useEffect(() => {
-    Object.keys(Cookies.get()).forEach(cookieName => {
-      Cookies.remove(cookieName)
-    })
-  }, [])
+    Object.keys(Cookies.get()).forEach((cookieName) => {
+      Cookies.remove(cookieName);
+    });
+  }, []);
 
   const handleLogin = useCallback(async () => {
     const result = await login(email, password);
     if (!result) {
-      showToast("Palavra passe ou email inválidos!", "")
+      showToast("Palavra passe ou email inválidos!", "");
     }
 
     if (result === "customer") {
-      showToast("Neste momento um cliente não pode fazer login na plataforma.", "")
+      showToast(
+        "Neste momento um cliente não pode fazer login na plataforma.",
+        ""
+      );
     }
 
     if (result === "seller" || result === "collaborator") {
-      window.location.href = '/seller'
+      window.location.href = "/seller";
     }
   }, [email, password]);
 
   return (
     <div className="flex flex-col bg-white py-6 items-center justify-center min-h-screen">
-      <div className="flex flex-col items-center justify-center max-w-[390px] min-w-[293px] w-full h-full px-6   px-6 bg-white ">
-
-        <Badge variant="outline" className="mb-4 text-xl">Vendedor</Badge>
+      <div className="flex flex-col items-center justify-center max-w-[390px] min-w-[293px] w-full h-full   px-6 bg-white ">
+        <Badge variant="outline" className="mb-4 text-xl">
+          Vendedor
+        </Badge>
 
         <Image
           src="/images/logo.png"
@@ -62,12 +69,18 @@ const LoginWithCredentials = () => {
           height={150}
           className="rounded-full mb-8"
         />
-        <h1 className="text-2xl font-bold text-black mb-6">Entre com sua senha</h1>
+        <h1 className="text-2xl font-bold text-black mb-6">
+          Entre com sua senha
+        </h1>
 
         {/* Input E-mail */}
         <div className="flex items-center w-full max-w-md mb-4 bg-gray-100 px-4 py-3 rounded-lg">
           <label htmlFor="email">
-            <FontAwesomeIcon width={16} icon={faEnvelope} className="text-gray-500" />
+            <FontAwesomeIcon
+              width={16}
+              icon={faEnvelope}
+              className="text-gray-500"
+            />
           </label>
           <input
             type="email"
@@ -82,7 +95,11 @@ const LoginWithCredentials = () => {
         {/* Input Senha */}
         <div className="flex items-center w-full max-w-md mb-4 bg-gray-100 px-4 py-3 rounded-lg">
           <label htmlFor="password">
-            <FontAwesomeIcon width={14} icon={faLock} className="text-gray-500" />
+            <FontAwesomeIcon
+              width={14}
+              icon={faLock}
+              className="text-gray-500"
+            />
           </label>
           <input
             type={isPasswordVisible ? "text" : "password"}
@@ -104,8 +121,9 @@ const LoginWithCredentials = () => {
         <div className="flex items-center justify-center w-full max-w-md mb-6">
           <button
             onClick={() => setRememberMe(!rememberMe)}
-            className={`w-5 h-5 mr-3 border-2 rounded ${rememberMe ? "bg-black border-black" : "border-gray-500"
-              }`}
+            className={`w-5 h-5 mr-3 border-2 rounded ${
+              rememberMe ? "bg-black border-black" : "border-gray-500"
+            }`}
           />
           <span className="text-black">Lembre de mim</span>
         </div>
@@ -122,7 +140,12 @@ const LoginWithCredentials = () => {
         {/* Separator */}
         <div className="flex items-center w-full max-w-md mb-6">
           <hr className="flex-1 border-gray-300" />
-          <Link href={"/forgot-password"} className="mx-3 text-black font-semibold underline">Esqueci minha senha</Link>
+          <Link
+            href={"/forgot-password"}
+            className="mx-3 text-black font-semibold underline"
+          >
+            Esqueci minha senha
+          </Link>
           <hr className="flex-1 border-gray-300" />
         </div>
 
@@ -167,21 +190,18 @@ const LoginWithCredentials = () => {
           </button>
         </p>*/}
         <p className="mt-8 text-gray-500 text-xs">
-          Pode rever a {" "}
-          <a
-            href="/legal/privacy-policy"
-            className="font-bold text-blue-400"
-          >
+          Pode rever a{" "}
+          <a href="/legal/privacy-policy" className="font-bold text-blue-400">
             Política de Privacidade
-          </a>
-          {" "}e os{" "}
+          </a>{" "}
+          e os{" "}
           <a
             href="/legal/terms-and-conditions"
             className="font-bold text-blue-400"
           >
             Termos de Utilização
-          </a>
-          {" "} da nossa app antes de a utilizar.
+          </a>{" "}
+          da nossa app antes de a utilizar.
         </p>
       </div>
     </div>

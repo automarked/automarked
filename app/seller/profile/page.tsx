@@ -175,6 +175,13 @@ const ProfileForm = () => {
                         />
                         <Input
                             type="text"
+                            value={profile.companyName}
+                            onChange={(e) => handleProfileChange('companyName', e.target.value)}
+                            className="border-[1px] border-gray-200 px-4 py-6"
+                            placeholder="Nome da empresa"
+                        />
+                        <Input
+                            type="text"
                             value={profile.municipality}
                             onChange={(e) => handleProfileChange('municipality', e.target.value ?? "")}
                             className="border-[1px] border-gray-200 px-4 py-6"
