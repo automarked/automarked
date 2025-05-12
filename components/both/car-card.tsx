@@ -69,7 +69,6 @@ const CarCard: React.FC<{ vehicle: InventoryItem, onDelete: React.Dispatch<React
             onMouseLeave={() => setIsHovered(false)}
         >
             <div
-                onClick={handleCardClick}
                 className="cursor-pointer"
             >
                 {/* Image Container */}
