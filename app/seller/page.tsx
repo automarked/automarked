@@ -392,15 +392,15 @@ const SellerDashboard = () => {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">
-                            Vendas Pendentes
+                            Vendas Canceladas
                           </span>
                           <span className="text-sm font-medium">
-                            {getSalesByState("pending")}/{sales.length}
+                            {getSalesByState("cancelled")}/{sales.length}
                           </span>
                         </div>
                         <Progress
                           value={
-                            (getSalesByState("pending") / sales.length) * 100
+                            (getSalesByState("cancelled") / sales.length) * 100
                           }
                           className="h-2"
                         />
