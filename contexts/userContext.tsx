@@ -65,6 +65,7 @@ export const useUser = (userId?: string): UserContextType & {
   getCollaborators: () => void
   collaborators: IUser[]
   getSupportId:  (email: string) => Promise<string | undefined>
+  deleteCollaborator: (collaboratorId: string) => Promise<boolean>
 } => {
   const context = useContext(UserContext);
   const [collaborators, setCollaborators] = useState<IUser[]>([])
@@ -226,6 +227,28 @@ export const useUser = (userId?: string): UserContextType & {
     [setProfile]
   );
 
+    // Delete collaborator function
+  const deleteCollaborator = useCallback(async (collaboratorId: string) => {
+    try {
+      const response = await createdInstance.delete(`/users/${collaboratorId}`);
+      
+      if (response.status === 200 || response.status === 204) {
+        console.log(response);
+        // Update the collaborators list by removing the deleted one
+        setCollaborators(prev => prev.filter(collab => collab.userId !== collaboratorId));
+        showToast("Sucesso!", "Colaborador removido com sucesso.");
+        return true;
+      } else {
+        showToast("Erro", "Não foi possível remover o colaborador.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error deleting collaborator:", error);
+      showToast("Erro", "Ocorreu um erro ao remover o colaborador.");
+      return false;
+    }
+  }, []);
+
 
   useEffect(() => {
     if (userId) getProfile()
@@ -233,7 +256,8 @@ export const useUser = (userId?: string): UserContextType & {
   if (!context) {
     throw new Error('useUser deve ser usado dentro de um UserProvider');
   }
-  return {
+
+   return {
     ...context,
     profile,
     getCollaborators,
@@ -245,6 +269,7 @@ export const useUser = (userId?: string): UserContextType & {
     selectImage: actions.selectImages,
     activeImagePreview,
     handleDiscardImage,
-    getSupportId
+    getSupportId,
+    deleteCollaborator
   };
 };
