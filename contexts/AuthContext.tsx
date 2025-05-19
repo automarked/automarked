@@ -78,10 +78,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setIsLoggedIn(true);
                 return type;
             } else {
-                setError(response.data.message || 'Erro ao fazer login!');
                 return false;
             }
-        } catch (err: any) {            
+        } catch (err: any) {      
             setError(err?.response?.data?.message || 'Erro ao fazer login');
             return false
         } finally {

@@ -40,7 +40,8 @@ const LoginWithCredentials = () => {
   const handleLogin = useCallback(async () => {
     const result = await login(email, password);
     if (!result) {
-      showToast(error ?? "Erro ao fazer login", "Tente novamente.");
+      console.log(error)
+      showToast(error ? error : "Erro ao fazer login, tente novamente mais tarde.", "");
     }
 
     if (result === "customer") {
