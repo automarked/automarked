@@ -59,33 +59,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, []);
 
-   // Update login method
-const login = useCallback(async (email: string, password: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-        const response = await createdInstance.post('/login', { email, password });
-        if (response.status === 200) {
-            const { token, user, type } = response.data.record as ISignInWithEmailAndPassword;
+    // Update login method
+    const login = useCallback(async (email: string, password: string) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await createdInstance.post('/login', { email, password });
+            if (response.status === 200) {
+                const { token, user, type } = response.data.record as ISignInWithEmailAndPassword;
 
-            setCookie('access', token.accessToken);
-            setCookie('expires-access', token.expirationTime.toString());
-            setCookie('refresh-access', token.refreshToken);
-            setCookie('secure-user', user);
-            setCookie('user-type', type);
+                setCookie('access', token.accessToken);
+                setCookie('expires-access', token.expirationTime.toString());
+                setCookie('refresh-access', token.refreshToken);
+                setCookie('secure-user', user);
+                setCookie('user-type', type);
 
-            setUser(user);
-            setIsLoggedIn(true);
-            return type;
+                setUser(user);
+                setIsLoggedIn(true);
+                return type;
+            } else {
+                setError(response.data.message || 'Erro ao fazer login!');
+                return false;
+            }
+        } catch (err: any) {            
+            setError(err?.response?.data?.message || 'Erro ao fazer login');
+            return false
+        } finally {
+            setIsLoading(false);
         }
-        return false;
-    } catch (err) {
-        setError('Erro ao fazer login!');
-        return false;
-    } finally {
-        setIsLoading(false);
-    }
-}, []);
+    }, []);
 
 
     const logout = useCallback(async () => {

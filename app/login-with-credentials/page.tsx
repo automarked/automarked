@@ -18,7 +18,7 @@ import { motion } from "framer-motion";
 
 const LoginWithCredentials = () => {
   const router = useRouter();
-  const { login, isLoading } = useAuth();
+  const { login, isLoading, error } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -40,7 +40,7 @@ const LoginWithCredentials = () => {
   const handleLogin = useCallback(async () => {
     const result = await login(email, password);
     if (!result) {
-      showToast("Palavra passe ou email inválidos!", "");
+      showToast(error ?? "Erro ao fazer login", "Tente novamente.");
     }
 
     if (result === "customer") {
