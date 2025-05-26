@@ -1,7 +1,7 @@
 {
-    "theme_color": "#ffffff",    
+    "theme_color": "#ffffff",
     "background_color": "#ffffff",
-    "icons": [
+    "icons": [    
         {
             "purpose": "maskable",
             "sizes": "512x512",
@@ -19,9 +19,9 @@
     "display": "standalone",
     "dir": "auto",
     "lang": "pt-PT",
-    "name": "Automarked",
-    "short_name": "Automarked",
-    "start_url": "https://automarket-A3D.vercel.app",
-    "scope": "https://automarket-A3D.vercel.app",
+    "name": "Vendedor Automarked",
+    "short_name": "Vendedor Automarked",
+    "start_url": "https://app.automarked.ao",
+    "scope": "https://app.automarked.ao",
     "description": "Automarked"
 }
