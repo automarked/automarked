@@ -121,7 +121,7 @@ const SellerDashboard = () => {
       title: "Inventário",
       value: formatCurrency(totalInventoryValue),
       description: "Valor total em Stock",
-      change: "+5%",
+      change: "",
       isPositive: true,
       icon: <FaCar className="w-6 h-6 text-white" />,
     },
@@ -129,7 +129,7 @@ const SellerDashboard = () => {
       title: "Total das vendas",
       value: getTotalSales(),
       description: "Todas as vendas",
-      change: "+12%",
+      change: "",
       isPositive: true,
       icon: <BarChart className="w-6 h-6 text-white" />,
     },
@@ -137,7 +137,7 @@ const SellerDashboard = () => {
       title: "Número de vendas",
       value: getTotalQuantitySales(),
       description: "Todas as vendas",
-      change: "-3%",
+      change: "",
       isPositive: false,
       icon: <MdOutlineSell className="w-6 h-6 text-white" />,
     },
@@ -145,7 +145,7 @@ const SellerDashboard = () => {
       title: "Viaturas",
       value: inventory.length,
       description: "Todas as Viaturas em Stock",
-      change: "+2",
+      change: "",
       isPositive: true,
       icon: <Car className="w-6 h-6 text-white" />,
     },
@@ -333,7 +333,7 @@ const SellerDashboard = () => {
             {profile?.type === "seller" && (
               <motion.div variants={fadeInUp} className="mt-6">
                 <StatCard
-                  change="+2"
+                  change=""
                   description="Contas associadas da empresa"
                   isPositive={true}
                   value={collaborators.length}
