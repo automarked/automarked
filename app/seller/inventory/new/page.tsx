@@ -11,7 +11,7 @@ import { Brand } from '@/models/brand';
 import { useCallback, useState } from 'react';
 import React, { useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { ImageIcon, PencilIcon } from "lucide-react";
+import { ImageIcon, PencilIcon, X, Upload, Car, Info, Camera, ArrowLeft, ArrowRight, Check } from "lucide-react";
 import useImage from '@/hooks/useImage';
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
@@ -38,7 +38,6 @@ type GalleryItemProps = {
 };
 
 const GalleryItem: React.FC<GalleryItemProps> = ({ add, remove, actions, images, loading }) => {
-
   const [previewImages, setPreviewImages] = useState<(string | null)[]>([]);
   const [error, setError] = useState<undefined | string>()
 
@@ -61,7 +60,6 @@ const GalleryItem: React.FC<GalleryItemProps> = ({ add, remove, actions, images,
 
   const saveAllImages = async () => {
     if (images.length < 4) {
-      console.log(images)
       setError("Carregue 4 imagens!")
       setTimeout(() => {
         setError(undefined)
@@ -80,52 +78,75 @@ const GalleryItem: React.FC<GalleryItemProps> = ({ add, remove, actions, images,
   };
 
   return (
-    <div>
-      <div className="grid grid-cols-3 gap-2">
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {previewImages.map((preview, index) => (
           <div
             key={index}
-            className="relative border border-gray-200 rounded-md overflow-hidden aspect-square flex items-center justify-center"
+            className="group relative border-2 border-dashed border-gray-200 rounded-xl overflow-hidden aspect-square flex items-center justify-center bg-gray-50 hover:border-blue-400 transition-all duration-300"
           >
             {preview ? (
-              <Image
-                width={100}
-                height={100}
-                src={preview}
-                alt={`Imagem ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
+              <>
+                <Image
+                  width={200}
+                  height={200}
+                  src={preview}
+                  alt={`Imagem ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="rounded-full"
+                    onClick={() => handleRemoveImage(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </>
             ) : (
-              <div className="flex flex-col items-center justify-center text-gray-500">
-                <ImageIcon className="h-8 w-8" />
+              <div className="flex flex-col items-center justify-center text-gray-400">
+                <ImageIcon className="h-8 w-8 mb-2" />
+                <span className="text-xs">Vazio</span>
               </div>
             )}
-            <div
-              className={cn(
-                "absolute cursor-pointer bottom-2 right-2 p-2 rounded-full bg-white shadow",
-                "hover:bg-gray-100 transition"
-              )}
-              onClick={() => handleRemoveImage(index)}
-            >
-              Remover
-            </div>
           </div>
         ))}
+
         {previewImages.length < 15 && (
           <div
-            className="relative border border-gray-200 rounded-md overflow-hidden aspect-square flex items-center justify-center cursor-pointer"
+            className="group relative border-2 border-dashed border-gray-300 rounded-xl aspect-square flex items-center justify-center cursor-pointer bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 hover:border-blue-400 transition-all duration-300"
             onClick={() => actions.selectImages()}
           >
-            <div className="flex flex-col items-center justify-center text-gray-500">
-              <PencilIcon className="h-8 w-8" />
-              <p className="text-sm text-center">Adicionar Imagem</p>
+            <div className="flex flex-col items-center justify-center text-gray-500 group-hover:text-blue-600 transition-colors">
+              <div className="p-3 rounded-full bg-white shadow-sm group-hover:shadow-md transition-shadow mb-2">
+                <Upload className="h-6 w-6" />
+              </div>
+              <span className="text-sm font-medium">Adicionar</span>
+              <span className="text-xs text-gray-400">Imagem</span>
             </div>
           </div>
         )}
       </div>
 
-      <div>
-        {error && <span className='text-red-600'>{error}</span>}
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+          <span className='text-red-600 text-sm font-medium'>{error}</span>
+        </div>
+      )}
+
+      <div className="text-center">
+        <p className="text-sm text-gray-500">
+          {images.length}/15 imagens • Mínimo 4 imagens necessárias
+        </p>
+        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+          <div
+            className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${Math.min((images.length / 4) * 100, 100)}%` }}
+          ></div>
+        </div>
       </div>
     </div>
   );
@@ -138,26 +159,26 @@ const vehicleSchema = z.object({
   licensePlate: z.string({ message: "Digite a matrícula." }),
   manufactureYear: z
     .string()
-    .regex(/^\d{4}$/, "Ano de fabricação deve ter 4 dígitos.") // Verifica se o ano tem 4 dígitos
+    .regex(/^\d{4}$/, "Ano de fabricação deve ter 4 dígitos.")
     .refine((value) => {
       const year = parseInt(value, 10);
-      return year <= new Date().getFullYear(); // Verifica se o ano não é no futuro
+      return year <= new Date().getFullYear();
     }, "Ano de fabricação não pode ser no futuro.")
     .refine((value) => parseInt(value, 10) > 0, "Ano inválido."),
   price: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/, "Preço deve ser um número positivo, podendo ter até 2 casas decimais.")
-    .refine((value) => parseFloat(value) > 0, "Preço deve ser maior que 0."), // Verifica se o pr
+    .refine((value) => parseFloat(value) > 0, "Preço deve ser maior que 0."),
   vehicleType: z.enum(["car", "moto"]),
   mileage: z
     .string()
-    .regex(/^\d+$/, "Quilometragem deve ser um número inteiro.") // Verifica se é um número inteiro
-    .refine((value) => parseInt(value, 10) >= 0, "Quilometragem não pode ser negativa."), // Verifica se a quilometragem não é negativa
+    .regex(/^\d+$/, "Quilometragem deve ser um número inteiro.")
+    .refine((value) => parseInt(value, 10) >= 0, "Quilometragem não pode ser negativa."),
   color: z.string({ message: "Digite a cor." }),
   bar_code: z.string({ message: "Digite o código de barras." }),
   internal_code: z.string({ message: "Digite o código interno." }),
   description: z.string().min(10, "A descrição deve ter pelo menos 10 caracteres."),
-  gallery: z.array(z.string()).min(4, "Adicione no mínimo 4 imagens à galeria. Salve as imagens antes de cadastrar."), // Garante que a galeria tenha no mínimo 4 imagens
+  gallery: z.array(z.string()).min(4, "Adicione no mínimo 4 imagens à galeria. Salve as imagens antes de cadastrar."),
   fuel: z.enum(["Gasolina", "Diesel", "Elétrico", "Híbrido"], { message: "Selecione o tipo de combustível." }),
   transmission: z.enum(["Manual", "Automática", "CVT"], { message: "Selecione o tipo de transmissão." }),
   enginePower: z
@@ -168,6 +189,88 @@ const vehicleSchema = z.object({
 });
 
 type VehicleFormData = z.infer<typeof vehicleSchema>;
+
+const StepIndicator: React.FC<{ currentStep: number; totalSteps: number }> = ({ currentStep, totalSteps }) => {
+  const steps = [
+    { title: "Informações Básicas", icon: Car },
+    { title: "Detalhes", icon: Info },
+    { title: "Especificações", icon: Camera }
+  ];
+
+  return (
+    <div className="flex items-center justify-center mb-8">
+      {steps.map((step, index) => {
+        const Icon = step.icon;
+        const isActive = index === currentStep;
+        const isCompleted = index < currentStep;
+
+        return (
+          <React.Fragment key={index}>
+            <div className="flex flex-col items-center">
+              <div className={cn(
+                "w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300",
+                isActive ? "bg-blue-600 border-blue-600 text-white" :
+                  isCompleted ? "bg-green-500 border-green-500 text-white" :
+                    "bg-gray-100 border-gray-300 text-gray-400"
+              )}>
+                {isCompleted ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
+              </div>
+              <span className={cn(
+                "text-xs mt-2 font-medium hidden sm:block",
+                isActive ? "text-blue-600" : isCompleted ? "text-green-600" : "text-gray-400"
+              )}>
+                {step.title}
+              </span>
+            </div>
+            {index < steps.length - 1 && (
+              <div className={cn(
+                "w-16 sm:w-24 h-0.5 mx-2 transition-colors duration-300",
+                index < currentStep ? "bg-green-500" : "bg-gray-300"
+              )} />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+};
+
+const FormSection: React.FC<{ title: string; description: string; children: React.ReactNode }> = ({
+  title,
+  description,
+  children
+}) => (
+  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+    <div className="mb-6">
+      <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
+      <p className="text-gray-600 text-sm">{description}</p>
+    </div>
+    <div className="space-y-6">
+      {children}
+    </div>
+  </div>
+);
+
+const FormField: React.FC<{
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+  required?: boolean;
+}> = ({ label, error, children, required = false }) => (
+  <div className="space-y-2">
+    <Label className="text-sm font-medium text-gray-700 flex items-center gap-1">
+      {label}
+      {required && <span className="text-red-500">*</span>}
+    </Label>
+    {children}
+    {error && (
+      <p className="text-red-500 text-sm flex items-center gap-1">
+        <X className="h-3 w-3" />
+        {error}
+      </p>
+    )}
+  </div>
+);
 
 const VehicleForm = () => {
   const useImageValues = useImage();
@@ -180,7 +283,7 @@ const VehicleForm = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [changesOnLicence, setChangesOnLicence] = useState('')
   const [error, setError] = useState<undefined | string>()
-  const {setLoading} = useMaterialLayout()
+  const { setLoading } = useMaterialLayout()
 
   const {
     control,
@@ -226,7 +329,6 @@ const VehicleForm = () => {
   }
 
   const onError = (errors: any) => {
-    // Get the first error message from the errors object
     const firstErrorKey = Object.keys(errors)[0];
     const firstErrorMessage = errors[firstErrorKey]?.message ?? 'Campo obrigatório';
 
@@ -235,7 +337,7 @@ const VehicleForm = () => {
       description: firstErrorMessage,
     });
   };
-  
+
   const handleSubmitAll = async () => {
     setLoading(true);
 
@@ -251,7 +353,6 @@ const VehicleForm = () => {
     const photoURLs = await useImageValues.actions.saveAll();
     if (photoURLs) {
       setValue("gallery", photoURLs);
-      // Now validate and submit form after gallery is set
       const formState = getValues();
       const validationResult = await vehicleSchema.safeParseAsync(formState);
 
@@ -292,302 +393,265 @@ const VehicleForm = () => {
     reset()
     handleRemoveAllImages()
 
-
     setTimeout(() => {
       setLoading(false)
       window.location.href = "/seller/inventory/";
     }, 2000);
   }, [user, profile]);
 
-  const formatPrice = (value: string): string => {
-    const numericValue = value.replace(/\D/g, "");
-
-    const integerPart = numericValue.slice(0, -2) || "0"; // Parte inteira (sem centavos)
-    const decimalPart = numericValue.slice(-2).padStart(2, "0"); // Parte decimal
-
-    // Converte para formato monetário
-    const formattedInteger = parseInt(integerPart, 10).toLocaleString("pt-AO");
-
-    // Retorna o valor formatado
-    return `AOA ${formattedInteger}, 00`;
-  };
-
   const [value, setPriceValue] = useState("AOA 0,00")
 
+  const handleNext = () => {
+    if (currentSection < 2) setCurrentSection((prev) => prev + 1);
+  };
+
+  const handlePrevious = () => {
+    if (currentSection > 0) setCurrentSection((prev) => prev - 1);
+  };
+
   const sections = [
+    // Section 1: Basic Information
     (
-      <>
-        {/* Marca */}
-        <div>
-          <Label className='ml-2'>Marca</Label>
-          <Controller
-            name="brand"
-            control={control}
-            render={({ field }) => (
-              <Select
-                value={field.value}
+      <FormSection
+        title="Informações Básicas"
+        description="Dados fundamentais do veículo"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField label="Marca" error={errors.brand?.message} required>
+            <Controller
+              name="brand"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    const selectedBrand = brandsList.find(
+                      (b) => b.brandName === value
+                    );
+                    setBrand(selectedBrand);
+                    setValue("brand", value);
+                  }}
+                >
+                  <SelectTrigger className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500">
+                    <SelectValue placeholder="Selecione a marca" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {brandsList.map((brandItem, _index: number) => (
+                      <SelectItem key={_index} value={brandItem.brandName}>
+                        {brandItem.brandName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </FormField>
 
-                onValueChange={(value) => {
-                  const selectedBrand = brandsList.find(
-                    (b) => b.brandName === value
-                  );
-                  setBrand(selectedBrand);
-                  setValue("brand", value);
-                }}
-              >
-                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
-                  <SelectValue placeholder="Selecione a marca" />
-                </SelectTrigger>
-                <SelectContent>
-                  {brandsList.map((brandItem, _index: number) => (
-                    <SelectItem
-                      key={_index}
-                      value={brandItem.brandName}
-                    >
-                      {brandItem.brandName}
+          <FormField label="Modelo" error={errors.model?.message} required>
+            <Controller
+              name="model"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => setValue("model", value)}
+                  disabled={!brand}
+                >
+                  <SelectTrigger className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500">
+                    <SelectValue placeholder="Selecione o modelo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {brand?.models.map((model, index: number) => (
+                      <SelectItem key={index} value={model.modelName}>
+                        {model.modelName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </FormField>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField label="Condição" error={errors.condition?.message} required>
+            <Controller
+              name="condition"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => setValue("condition", value === "Novo" ? "Novo" : "Usado")}
+                >
+                  <SelectTrigger className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500">
+                    <SelectValue placeholder="Selecione a condição" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Novo">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Novo
+                      </div>
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.brand && (
-            <p className="text-red-600">{errors.brand.message}</p>
-          )}
-        </div>
-        {/* Modelo */}
-        <div>
-          <Label className='ml-2'>Modelo</Label>
-          <Controller
-            name="model"
-            control={control}
-            render={({ field }) => (
-              <Select
-                value={field.value}
-
-                onValueChange={(value) => setValue("model", value)}
-              >
-                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
-                  <SelectValue placeholder="Selecione o modelo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {brand?.models.map((model, index: number) => (
-                    <SelectItem key={index} value={model.modelName}>
-                      {model.modelName}
+                    <SelectItem value="Usado">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                        Usado
+                      </div>
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.model && <p className="text-red-600">{errors.model.message}</p>}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </FormField>
+
+          <FormField label="Tipo de Veículo" error={errors.vehicleType?.message} required>
+            <Controller
+              name="vehicleType"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => setValue("vehicleType", value === "car" ? "car" : "moto")}
+                >
+                  <SelectTrigger className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500">
+                    <SelectValue placeholder="Selecione o tipo de veículo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="car">🚗 Carro</SelectItem>
+                    <SelectItem value="moto">🏍️ Moto</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </FormField>
         </div>
 
-        {/* Condição */}
-        <div>
-          <Label className='ml-2'>Condição</Label>
-          <Controller
-            name="condition"
-            control={control}
-            render={({ field }) => (
-              <Select
-                value={field.value}
-                onValueChange={(value) => setValue("condition", value === "Novo" ? "Novo" : "Usado")}
-              >
-                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
-                  <SelectValue placeholder="Selecione a condição" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Novo">Novo</SelectItem>
-                  <SelectItem value="Usado">Usado</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.condition && (
-            <p className="text-red-600">{errors.condition.message}</p>
-          )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField label="Matrícula" error={errors.licensePlate?.message} required>
+            <Controller
+              name="licensePlate"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                  {...field}
+                  placeholder="XX-00-00-XX"
+                  onChange={(e) => {
+                    if (e.target.value.length > changesOnLicence.length) {
+                      const formattedValue = formatLicensePlate(e.target.value);
+                      field.onChange(formattedValue);
+                      setChangesOnLicence(e.target.value)
+                    } else {
+                      field.onChange(e.target.value);
+                      setChangesOnLicence(e.target.value)
+                    }
+                  }}
+                  value={field.value}
+                />
+              )}
+            />
+          </FormField>
+
+          <FormField label="Ano de Fabricação" error={errors.manufactureYear?.message} required>
+            <Controller
+              name="manufactureYear"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                  {...field}
+                  placeholder="2024"
+                  maxLength={4}
+                />
+              )}
+            />
+          </FormField>
         </div>
-
-        {/* Matrícula */}
-        <div>
-          <Label className="ml-2">Matrícula</Label>
-          <Controller
-            name="licensePlate"
-            control={control}
-            render={({ field }) => (
-              <Input
-                className="border-[1px] border-slate-100 py-6 px-4"
-                {...field}
-                placeholder="Digite a matrícula"
-
-                onChange={(e) => {
-                  if (e.target.value.length > changesOnLicence.length) {
-                    const formattedValue = formatLicensePlate(e.target.value);
-                    field.onChange(formattedValue); // Atualiza o estado controlado
-                    setChangesOnLicence(e.target.value)
-                  } else {
-                    field.onChange(e.target.value);
-                    setChangesOnLicence(e.target.value)
-                  }
-                }}
-                value={field.value} // Garante que o valor formatado seja exibido
-              />
-            )}
-          />
-          {errors.licensePlate && (
-            <p className="text-red-600">{errors.licensePlate.message}</p>
-          )}
-        </div>
-
-        {/* Ano de Fabricação */}
-        <div>
-          <Label className='ml-2'>Ano de Fabricação</Label>
-          <Controller
-            name="manufactureYear"
-            control={control}
-            render={({ field }) => (
-              <Input
-                className='border-[1px] border-slate-100 py-6 px-4'
-                {...field}
-                placeholder="Digite o ano de fabricação"
-
-              />
-            )}
-          />
-          {errors.manufactureYear && (
-            <p className="text-red-600">{errors.manufactureYear.message}</p>
-          )}
-        </div>
-      </>
+      </FormSection>
     ),
+
+    // Section 2: Details
     (
-      <>
-        {/* Preço */}
-        <div>
-          <Label className="ml-2">Preço</Label>
-          <Controller
-            name="price"
-            control={control}
-            render={({ field }) => (
-              <Input
-                className="border-[1px] border-slate-100 py-6 px-4"
-                placeholder="Digite o preço"
-
-                value={value}
-                onChange={(e) => {
-                  // Remove tudo que não é número
-                  const numbersOnly = e.target.value.replace(/\D/g, '');
-
-                  // Converte para número e divide por 100 para considerar os centavos
-                  const numberValue = Number(numbersOnly) / 100;
-
-                  // Formata o número como moeda brasileira
-                  const formattedValue = new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL',
-                  }).format(numberValue);
-
-                  // Atualiza o estado com o valor formatado
-                  setPriceValue(formattedValue.replace('R$', 'AOA'));
-
-                  // Se precisar do valor numérico para enviar ao backend
-                  const numericValue = numberValue;
-
-                  setValue("price", numericValue.toString())
-                  console.log(getValues('price'));
-
-                }}
-              />
-            )}
-          />
-          {errors.price && <p className="text-red-600">{errors.price.message}</p>}
-        </div>
-
-        {/* Tipo de Veículo */}
-        <div>
-          <Label className='ml-2'>Tipo de Veículo</Label>
-          <Controller
-            name="vehicleType"
-            control={control}
-            render={({ field }) => (
-              <Select
-                value={field.value}
-                onValueChange={(value) => setValue("vehicleType", value === "car" ? "car" : "moto")}
-              >
-                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
-                  <SelectValue placeholder="Selecione o tipo de veículo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="car">Carro</SelectItem>
-                  <SelectItem value="moto">Moto</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.vehicleType && (
-            <p className="text-red-600">{errors.vehicleType.message}</p>
-          )}
-        </div>
-
-        {/* Quilometragem */}
-        <div>
-          <Label className="ml-2">Quilometragem</Label>
-          <Controller
-            name="mileage"
-            control={control}
-            render={({ field }) => {
-              const formatMileage = (value: string) => {
-                // Remove non-numeric characters
-                const numbers = value.replace(/\D/g, '');
-
-                // Handle empty or zero value
-                if (!numbers || parseInt(numbers) === 0) {
-                  return "0,00";
-                }
-
-                // Convert to number and format with thousands separator and decimal places
-                const numeric = Number(numbers) / 100;
-                const formatted = new Intl.NumberFormat('pt-BR', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                }).format(numeric);
-
-                return formatted;
-              };
-
-              const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-                const rawValue = e.target.value.replace(/\D/g, '');
-                const formattedValue = formatMileage(rawValue);
-
-                // Update display value
-                e.target.value = formattedValue;
-
-                // Store raw numeric value in form state
-                field.onChange(rawValue);
-              };
-
-              return (
+      <FormSection
+        title="Detalhes do Veículo"
+        description="Informações específicas e identificação"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField label="Preço" error={errors.price?.message} required>
+            <Controller
+              name="price"
+              control={control}
+              render={({ field }) => (
                 <div className="relative">
                   <Input
-                    className="border-[1px] border-slate-100 py-6 px-4 pr-16"
-                    value={formatMileage(field.value)}
+                    className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 pl-16"
                     placeholder="0,00"
-                    onChange={handleInputChange}
+                    value={value}
+                    onChange={(e) => {
+                      const numbersOnly = e.target.value.replace(/\D/g, '');
+                      const numberValue = Number(numbersOnly) / 100;
+                      const formattedValue = new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                      }).format(numberValue);
 
+                      setPriceValue(formattedValue.replace('R$', 'AOA'));
+                      setValue("price", numberValue.toString())
+                    }}
                   />
-                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">km</span>
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">
+                    AOA
+                  </div>
                 </div>
-              );
-            }}
-          />
+              )}
+            />
+          </FormField>
 
-          {errors.mileage && <p className="text-red-600">{errors.mileage.message}</p>}
+          <FormField label="Quilometragem" error={errors.mileage?.message} required>
+            <Controller
+              name="mileage"
+              control={control}
+              render={({ field }) => {
+                const formatMileage = (value: string) => {
+                  const numbers = value.replace(/\D/g, '');
+                  if (!numbers || parseInt(numbers) === 0) {
+                    return "0,00";
+                  }
+                  const numeric = Number(numbers) / 100;
+                  const formatted = new Intl.NumberFormat('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  }).format(numeric);
+                  return formatted;
+                };
+
+                const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                  const rawValue = e.target.value.replace(/\D/g, '');
+                  const formattedValue = formatMileage(rawValue);
+                  e.target.value = formattedValue;
+                  field.onChange(rawValue);
+                };
+
+                return (
+                  <div className="relative">
+                    <Input
+                      className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 pr-12"
+                      value={formatMileage(field.value)}
+                      placeholder="0,00"
+                      onChange={handleInputChange}
+                    />
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">
+                      km
+                    </span>
+                  </div>
+                );
+              }}
+            />
+          </FormField>
         </div>
 
-        {/* Cor */}
-        <div>
-          <Label className='ml-2'>Cor</Label>
+        <FormField label="Cor" error={errors.color?.message} required>
           <Controller
             name="color"
             control={control}
@@ -595,18 +659,17 @@ const VehicleForm = () => {
               <Select
                 value={field.value}
                 onValueChange={(value) => setValue("color", value)}
-
               >
-                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
+                <SelectTrigger className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500">
                   <SelectValue placeholder="Selecione a cor" />
                 </SelectTrigger>
                 <SelectContent>
                   {Colors.map((color) => (
                     <SelectItem key={color.hex} value={color.nome}>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-3">
                         <div
                           style={{ backgroundColor: color.hex }}
-                          className="w-4 h-4 rounded-full"
+                          className="w-5 h-5 rounded-full border border-gray-200"
                         />
                         <span>{color.nome}</span>
                       </div>
@@ -616,219 +679,273 @@ const VehicleForm = () => {
               </Select>
             )}
           />
+        </FormField>
 
-          {errors.color && <p className="text-red-600">{errors.color.message}</p>}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField label="Código de Barras" error={errors.bar_code?.message} required>
+            <Controller
+              name="bar_code"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                  {...field}
+                  placeholder="Digite o código de barras"
+                />
+              )}
+            />
+          </FormField>
+
+          <FormField label="Código Interno" error={errors.internal_code?.message} required>
+            <Controller
+              name="internal_code"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                  {...field}
+                  placeholder="Digite o código interno"
+                />
+              )}
+            />
+          </FormField>
         </div>
-
-
-        {/* Código de Barras */}
-        <div>
-          <Label className='ml-2'>Código de Barras</Label>
-          <Controller
-            name="bar_code"
-            control={control}
-            render={({ field }) => (
-              <Input
-                className='border-[1px] border-slate-100 py-6 px-4'
-                {...field}
-                placeholder="Digite o código de barras"
-
-              />
-            )}
-          />
-          {errors.bar_code && (
-            <p className="text-red-600">{errors.bar_code.message}</p>
-          )}
-        </div>
-      </>
+      </FormSection>
     ),
+
+    // Section 3: Specifications & Gallery
     (
-      <>
-        <div>
-          <Label className="ml-2">Combustível</Label>
-          <Controller
-            name="fuel"
-            control={control}
-            render={({ field }) => (
-              <Select
-                value={field.value}
-                onValueChange={(value) => setValue("fuel", value as "Gasolina" | "Diesel" | "Elétrico" | "Híbrido")}
-
-              >
-                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
-                  <SelectValue placeholder="Selecione o tipo de combustível" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Gasolina">Gasolina</SelectItem>
-                  <SelectItem value="Diesel">Diesel</SelectItem>
-                  <SelectItem value="Elétrico">Elétrico</SelectItem>
-                  <SelectItem value="Híbrido">Híbrido</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.fuel && <p className="text-red-600">{errors.fuel.message}</p>}
-        </div>
-
-        <div>
-          <Label className="ml-2">Transmissão</Label>
-          <Controller
-            name="transmission"
-            control={control}
-            render={({ field }) => (
-              <Select
-                value={field.value}
-                onValueChange={(value) => setValue("transmission", value as "Manual" | "Automática" | "CVT")}
-
-              >
-                <SelectTrigger className="w-full border-[1px] border-slate-100 py-6 px-4">
-                  <SelectValue placeholder="Selecione o tipo de transmissão" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Manual">Manual</SelectItem>
-                  <SelectItem value="Automática">Automática</SelectItem>
-                  <SelectItem value="CVT">CVT</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.transmission && <p className="text-red-600">{errors.transmission.message}</p>}
-        </div>
-
-        <div>
-          <Label className="ml-2">Potência do Motor (cv)</Label>
-          <Controller
-            name="enginePower"
-            control={control}
-            render={({ field }) => (
-              <Input
-                className="border-[1px] border-slate-100 py-6 px-4"
-                {...field}
-                placeholder="Digite a potência do motor"
-
+      <div className="space-y-8">
+        <FormSection
+          title="Especificações Técnicas"
+          description="Características técnicas do veículo"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField label="Combustível" error={errors.fuel?.message} required>
+              <Controller
+                name="fuel"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => setValue("fuel", value as "Gasolina" | "Diesel" | "Elétrico" | "Híbrido")}
+                  >
+                    <SelectTrigger className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500">
+                      <SelectValue placeholder="Selecione o tipo de combustível" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Gasolina">⛽ Gasolina</SelectItem>
+                      <SelectItem value="Diesel">🛢️ Diesel</SelectItem>
+                      <SelectItem value="Elétrico">🔋 Elétrico</SelectItem>
+                      <SelectItem value="Híbrido">🔄 Híbrido</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
               />
-            )}
-          />
-          {errors.enginePower && <p className="text-red-600">{errors.enginePower.message}</p>}
-        </div>
+            </FormField>
 
-        <div>
-          <Label className="ml-2">Localização</Label>
-          <Controller
-            name="location"
-            control={control}
-            render={({ field }) => (
-              <Input
-                className="border-[1px] border-slate-100 py-6 px-4"
-                {...field}
-                placeholder="Digite a localização"
-
+            <FormField label="Transmissão" error={errors.transmission?.message} required>
+              <Controller
+                name="transmission"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => setValue("transmission", value as "Manual" | "Automática" | "CVT")}
+                  >
+                    <SelectTrigger className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500">
+                      <SelectValue placeholder="Selecione o tipo de transmissão" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Manual">🎛️ Manual</SelectItem>
+                      <SelectItem value="Automática">⚙️ Automática</SelectItem>
+                      <SelectItem value="CVT">🔧 CVT</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
               />
-            )}
-          />
-          {errors.location && <p className="text-red-600">{errors.location.message}</p>}
-        </div>
+            </FormField>
+          </div>
 
-        {/* Código Interno */}
-        <div>
-          <Label className='ml-2'>Código Interno</Label>
-          <Controller
-            name="internal_code"
-            control={control}
-            render={({ field }) => (
-              <Input
-                className='border-[1px] border-slate-100 py-6 px-4'
-                {...field}
-                placeholder="Digite o código interno"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField label="Potência do Motor" error={errors.enginePower?.message} required>
+              <Controller
+                name="enginePower"
+                control={control}
+                render={({ field }) => (
+                  <div className="relative">
+                    <Input
+                      className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 pr-12"
+                      {...field}
+                      placeholder="150"
+                    />
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">
+                      CV
+                    </span>
+                  </div>
+                )}
               />
-            )}
-          />
-          {errors.internal_code && (
-            <p className="text-red-600">{errors.internal_code.message}</p>
-          )}
-        </div>
+            </FormField>
 
-        {/* Descrição */}
-        <div>
-          <Label className='ml-2'>Descrição</Label>
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => (
-              <Textarea
-                className='border-[1px] border-slate-100 py-6 px-4'
-                {...field}
-                placeholder="Digite uma descrição"
-
+            <FormField label="Localização" error={errors.location?.message} required>
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                    {...field}
+                    placeholder="Luanda, Angola"
+                  />
+                )}
               />
-            )}
-          />
-          {errors.description && (
-            <p className="text-red-600">{errors.description.message}</p>
-          )}
-        </div>
+            </FormField>
+          </div>
 
-        {/* Galeria */}
-        <div>
-          <Label className='ml-2'>Galeria (de 4 à 15 fotografias)</Label>
-          <div className="w-full">
+          <FormField label="Descrição" error={errors.description?.message} required>
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <Textarea
+                  className="min-h-[120px] border-gray-200 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                  {...field}
+                  placeholder="Descreva as características, estado de conservação e diferenciais do veículo..."
+                />
+              )}
+            />
+          </FormField>
+        </FormSection>
 
+        <FormSection
+          title="Galeria de Imagens"
+          description="Adicione fotos de alta qualidade do veículo"
+        >
+          <FormField label="Fotografias do Veículo" error={errors.gallery?.message} required>
             <GalleryItem
               {...useImageValues}
               remove={handleRemoveImage}
               add={addImageToGallery}
             />
-
-          </div>
-          {errors.gallery && (
-            <p className="text-red-600">{errors.gallery.message}</p>
-          )}
-        </div>
-
-        {/* <div>
-        <VehicleSpecifications handleInputChange={addSpecification} specifications={getValues('specifications')}/>
-      </div> */}
-      </>
+          </FormField>
+        </FormSection>
+      </div>
     )
-  ]
-
-  const handleNext = () => {
-    if (currentSection < sections.length - 1) setCurrentSection((prev) => prev + 1);
-  };
-
-  const handlePrevious = () => {
-    if (currentSection > 0) setCurrentSection((prev) => prev - 1);
-  };
-
+  ];
 
   return (
-    <>
-      <form
-        onSubmit={handleSubmit(onSubmit, onError)}
-        className="space-y-8 max-w-2xl mx-auto p-4 mb-24"
-      >
-        <h2 className="text-2xl text-center font-semibold">Adicionar novo veículo</h2>
-
-
-        {/* <div className='flex items-center gap-4'>
-          <Stepper currentStep={currentSection} setCurrentStep={setCurrentSection} />
-        </div> */}
-
-        <div className='flex flex-col gap-2 pb-12'>
-          {sections[0]}
-          {sections[1]}
-          {sections[2]}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl mb-4">
+            <Car className="h-8 w-8 text-white" />
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+            Adicionar Novo Veículo
+          </h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Preencha as informações do veículo para adicioná-lo ao seu inventário
+          </p>
         </div>
 
-        <div className="flex justify-center">
+        {/* Step Indicator */}
+        <StepIndicator currentStep={currentSection} totalSteps={3} />
 
-          <Button type="button" onClick={handleSubmitAll} className="w-full max-w-md py-6 mb-6 bg-[var(--black)] text-white rounded-full text-lg font-medium">
-            Cadastrar veículo
-          </Button>
-          {/* )} */}
+        {/* Form */}
+        <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-8">
+          {/* Current Section */}
+          <div className="transition-all duration-500 ease-in-out">
+            {sections[currentSection]}
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-between items-center pt-8">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handlePrevious}
+              disabled={currentSection === 0}
+              className="w-full sm:w-auto h-12 px-8 border-gray-300 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Anterior
+            </Button>
+
+            <div className="flex-1 text-center">
+              <span className="text-sm text-gray-500">
+                Etapa {currentSection + 1} de 3
+              </span>
+            </div>
+
+            {currentSection < 2 ? (
+              <Button
+                type="button"
+                onClick={handleNext}
+                className="w-full sm:w-auto h-12 px-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+              >
+                Próximo
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={handleSubmitAll}
+                disabled={useImageValues.loading}
+                className="w-full sm:w-auto h-12 px-8 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold"
+              >
+                {useImageValues.loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Processando...
+                  </>
+                ) : (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    Cadastrar Veículo
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+        </form>
+
+        {/* Progress Bar */}
+        <div className="mt-8">
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 h-2 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${((currentSection + 1) / 3) * 100}%` }}
+            ></div>
+          </div>
+          <div className="flex justify-between text-xs text-gray-500 mt-2">
+            <span>Início</span>
+            <span>Progresso: {Math.round(((currentSection + 1) / 3) * 100)}%</span>
+            <span>Finalizar</span>
+          </div>
         </div>
-      </form>    
-    </>
+
+        {/* Help Section */}
+        <div className="mt-12 bg-blue-50 border border-blue-200 rounded-2xl p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <Info className="h-5 w-5 text-blue-600" />
+              </div>
+            </div>
+            <div>
+              <h3 className="font-semibold text-blue-900 mb-2">Dicas para um cadastro eficiente</h3>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• Use fotos de alta qualidade e bem iluminadas</li>
+                <li>• Inclua imagens do exterior, interior e motor</li>
+                <li>• Seja detalhado na descrição do veículo</li>
+                <li>• Verifique todas as informações antes de finalizar</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
