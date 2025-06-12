@@ -48,6 +48,7 @@ import WhatsAppFloatingButton from "@/components/both/contact-support";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import Image from "next/image";
 
 const SellerDashboard = () => {
   const { user } = useAuth();
@@ -451,15 +452,14 @@ const SellerDashboard = () => {
                             className="flex items-start gap-3 pb-3 border-b border-gray-100"
                           >
                             <div
-                              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                sale.state === "completed"
+                              className={`w-8 h-8 rounded-full flex items-center justify-center ${sale.state === "completed"
                                   ? "bg-green-100 text-green-600"
                                   : sale.state === "pending"
-                                  ? "bg-yellow-100 text-yellow-600"
-                                  : sale.state === "confirmed"
-                                  ? "bg-blue-100 text-blue-600"
-                                  : "bg-red-100 text-red-600"
-                              }`}
+                                    ? "bg-yellow-100 text-yellow-600"
+                                    : sale.state === "confirmed"
+                                      ? "bg-blue-100 text-blue-600"
+                                      : "bg-red-100 text-red-600"
+                                }`}
                             >
                               {sale.state === "completed" ? (
                                 <CheckCheckIcon size={14} />
@@ -483,23 +483,22 @@ const SellerDashboard = () => {
                             </div>
                             <div className="ml-auto">
                               <span
-                                className={`text-xs font-medium px-2 py-1 rounded-full ${
-                                  sale.state === "completed"
+                                className={`text-xs font-medium px-2 py-1 rounded-full ${sale.state === "completed"
                                     ? "bg-green-100 text-green-600"
                                     : sale.state === "pending"
-                                    ? "bg-yellow-100 text-yellow-600"
-                                    : sale.state === "confirmed"
-                                    ? "bg-blue-100 text-blue-600"
-                                    : "bg-red-100 text-red-600"
-                                }`}
+                                      ? "bg-yellow-100 text-yellow-600"
+                                      : sale.state === "confirmed"
+                                        ? "bg-blue-100 text-blue-600"
+                                        : "bg-red-100 text-red-600"
+                                  }`}
                               >
                                 {sale.state === "completed"
                                   ? "Completado"
                                   : sale.state === "pending"
-                                  ? "Pendente"
-                                  : sale.state === "confirmed"
-                                  ? "Confirmado"
-                                  : "Cancelado"}
+                                    ? "Pendente"
+                                    : sale.state === "confirmed"
+                                      ? "Confirmado"
+                                      : "Cancelado"}
                               </span>
                             </div>
                           </div>
@@ -616,9 +615,11 @@ const SellerDashboard = () => {
                             <div className="w-16 h-12 bg-gray-100 rounded overflow-hidden">
                               {item.vehicles.gallery &&
                                 item.vehicles.gallery.length > 0 && (
-                                  <img
+                                  <Image
                                     src={item.vehicles.gallery[0]}
-                                    alt={`${item.vehicles.brand} ${item.vehicles.model}`}
+                                    alt={`Imagem do ${item.vehicles.brand} ${item.vehicles.model}`}
+                                    width={50}
+                                    height={50}
                                     className="w-full h-full object-cover"
                                   />
                                 )}
@@ -637,7 +638,7 @@ const SellerDashboard = () => {
                                 {formatCurrency(Number(item.vehicles.price))}
                               </p>
                               <Link
-                                href={`/seller/inventory/${item.vehicles.vehicleId}`}
+                                href={`/seller/inventory/car-detail/${item.vehicles.vehicleId}`}
                                 className="text-xs text-blue-600 hover:underline"
                               >
                                 Ver detalhes
@@ -692,8 +693,8 @@ const SellerDashboard = () => {
                         <span className="font-medium">
                           {inventory.length > 0
                             ? formatCurrency(
-                                totalInventoryValue / inventory.length
-                              )
+                              totalInventoryValue / inventory.length
+                            )
                             : "AOA 0,00"}
                         </span>
                       </div>
@@ -702,12 +703,12 @@ const SellerDashboard = () => {
                         <span className="font-medium">
                           {inventory.length > 0
                             ? formatCurrency(
-                                Math.max(
-                                  ...inventory.map((item) =>
-                                    Number(item.vehicles.price)
-                                  )
+                              Math.max(
+                                ...inventory.map((item) =>
+                                  Number(item.vehicles.price)
                                 )
                               )
+                            )
                             : "AOA 0,00"}
                         </span>
                       </div>
@@ -716,12 +717,12 @@ const SellerDashboard = () => {
                         <span className="font-medium">
                           {inventory.length > 0
                             ? formatCurrency(
-                                Math.min(
-                                  ...inventory.map((item) =>
-                                    Number(item.vehicles.price)
-                                  )
+                              Math.min(
+                                ...inventory.map((item) =>
+                                  Number(item.vehicles.price)
                                 )
                               )
+                            )
                             : "AOA 0,00"}
                         </span>
                       </div>
