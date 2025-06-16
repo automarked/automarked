@@ -91,13 +91,32 @@ export const InventoryProvider = ({ userId, children }: InventoryProviderProps) 
 
     const updateVehicle = async (vehicle: Vehicle) => {
         try {
-            showToast("Sucesso!", `O Veículo ${vehicle.brand} ${vehicle.model} matrícula ${vehicle.licensePlate} foi actualizado com sucesso do seu inventário!`)
-            setInventory(inventory.filter(inv => inv.vehicles.vehicleId !== vehicle.vehicleId))
-            fetchInventory();
-            fetchTotalInventoryValue();
+            // Make API call to update the vehicle
+            const response = await createdInstance.put("/inventory/update", {
+                userId,
+                vehicle
+            });
+
+            if (response.status === 200) {
+                // Update local state by replacing the updated vehicle
+                setInventory(prevInventory =>
+                    prevInventory.map(inv =>
+                        inv.vehicles.vehicleId === vehicle.vehicleId
+                            ? { ...inv, vehicles: vehicle }
+                            : inv
+                    )
+                );
+                
+                // Refresh inventory and total value
+                fetchInventory();
+                fetchTotalInventoryValue();
+                
+                showToast("Sucesso!", `O Veículo ${vehicle.brand} ${vehicle.model} matrícula ${vehicle.licensePlate} foi atualizado com sucesso!`);
+            }
         } catch (err: any) {
-            showToast("Erro ao deletar!", `Não foi possivel actualizar o veículo do seu inventário!\n Por favor, aguarde e tente novamente daqui a alguns segundos, se o problema perssistir entre em contacto com a equipe técnica ou reporte o erro ao seu responsável.`)
+            showToast("Erro ao atualizar!", `Não foi possível atualizar o veículo do seu inventário!\nPor favor, aguarde e tente novamente daqui a alguns segundos. Se o problema persistir, entre em contacto com a equipe técnica ou reporte o erro ao seu responsável.`);
             setError(err.message);
+            console.error("Error updating vehicle:", err);
         }
     }
 
