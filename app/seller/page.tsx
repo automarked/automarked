@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { formatCurrency } from "@/scripts/format-price";
 import { FaCar, FaPlus } from "react-icons/fa";
 import {
@@ -49,6 +49,14 @@ import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import Image from "next/image";
+import { toast } from "@/hooks/use-toast";
+
+interface Advertisement {
+  id: string;
+  title: string;
+  image: string;
+  status: boolean;
+}
 
 const SellerDashboard = () => {
   const { user } = useAuth();
@@ -60,6 +68,12 @@ const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
+  // Advertisement states
+  const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
+  const [advertisementsLoading, setAdvertisementsLoading] = useState(false);
+  const [advertisementsError, setAdvertisementsError] = useState<string | null>(null);
+
 
   const fetchSales = async () => {
     setIsLoading(true);
@@ -79,6 +93,33 @@ const SellerDashboard = () => {
     fetchSales();
     getCollaborators();
   }, [user]);
+
+  const showToast = (title: string, message: string, variant: "default" | "destructive" = "default") => {
+    toast({
+      title,
+      description: message,
+      variant,
+    });
+  };
+
+  const fetchAdvertisements = useCallback(async () => {
+    setAdvertisementsLoading(true);
+    try {
+      const response = await createdInstance.get<Advertisement[]>("/advertisements");
+      setAdvertisements(response.data);
+      setAdvertisementsError(null);
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "Erro ao carregar anúncios";
+      setAdvertisementsError(errorMessage);
+      showToast("Erro", errorMessage, "destructive");
+    } finally {
+      setAdvertisementsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAdvertisements();
+  }, [fetchAdvertisements]);
 
   const getTotalQuantitySales = () => {
     var quantitySale = 0;
@@ -202,6 +243,9 @@ const SellerDashboard = () => {
     },
   };
 
+  // Filter active advertisements
+  const activeAdvertisements = advertisements.filter(ad => ad.status);
+
   return (
     <>
       <motion.div
@@ -259,52 +303,99 @@ const SellerDashboard = () => {
           </div>
         </motion.div>
 
-        <Carousel
-          className="w-full mb-8 mx-auto"
-          plugins={[
-            Autoplay({
-              delay: 5000,
-            }),
-          ]}
+        {/* Featured Offers Section */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <CarouselContent>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <CarouselItem key={index}>
-                <Card className="h-[200px] md:h-[350px] relative overflow-hidden shadow-md border-0">
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent z-10"></div>
-                  <div className="absolute bottom-0 left-0 p-6 z-20 text-white">
-                    <h3 className="text-2xl font-bold mb-2">
-                      {index % 2 === 0
-                        ? "Aumente suas vendas"
-                        : "Gerencie seu inventário"}
-                    </h3>
-                    <p className="max-w-md">
-                      {index % 2 === 0
-                        ? "Descubra como a AutoMarked pode ajudar a impulsionar seus negócios."
-                        : "Mantenha seu estoque organizado e atraia mais clientes."}
-                    </p>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center">
+              <span className="bg-orange-500 w-2 h-8 rounded-full mr-2"></span>
+              Ofertas Especiais
+            </h2>
+          </div>
+
+          {advertisementsLoading ? (
+            <div className="w-full mb-6 md:mb-10 rounded-xl md:rounded-2xl overflow-hidden shadow-lg md:shadow-xl">
+              <Card className="h-[180px] sm:h-[250px] md:h-[400px] relative overflow-hidden border-0 shadow-none bg-gray-200 animate-pulse">
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-gray-500">Carregando anúncios...</div>
+                </div>
+              </Card>
+            </div>
+          ) : advertisementsError ? (
+            <div className="w-full mb-6 md:mb-10 rounded-xl md:rounded-2xl overflow-hidden shadow-lg md:shadow-xl">
+              <Card className="h-[180px] sm:h-[250px] md:h-[400px] relative overflow-hidden border-0 shadow-none bg-red-50">
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-red-500 text-center p-4">
+                    <p className="font-medium">Erro ao carregar anúncios</p>
+                    <p className="text-sm mt-1">{advertisementsError}</p>
+                    <button
+                      onClick={fetchAdvertisements}
+                      className="mt-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                    >
+                      Tentar novamente
+                    </button>
                   </div>
-                  {index % 2 !== 0 && (
-                    <img
-                      src="/images/banner1.jpeg"
-                      className="w-full h-full object-cover"
-                      alt="Banner promocional"
-                    />
-                  )}
-                  {index % 2 === 0 && (
-                    <img
-                      src="/images/banner2.jpeg"
-                      className="w-full h-full object-cover"
-                      alt="Banner promocional"
-                    />
-                  )}
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="left-4 bg-white/80 hover:bg-white" />
-          <CarouselNext className="right-4 bg-white/80 hover:bg-white" />
-        </Carousel>
+                </div>
+              </Card>
+            </div>
+          ) : activeAdvertisements.length > 0 ? (
+            <Carousel
+              className="w-full mb-6 md:mb-10 rounded-xl md:rounded-2xl overflow-hidden shadow-lg md:shadow-xl"
+              plugins={[
+                Autoplay({
+                  delay: 3000,
+                }),
+              ]}
+            >
+              <CarouselContent>
+                {activeAdvertisements.map((advertisement) => (
+                  <CarouselItem key={advertisement.id} className="relative">
+                    <Card className="h-[180px] sm:h-[250px] md:h-[400px] relative overflow-hidden border-0 shadow-none">
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={advertisement.image}
+                          alt={advertisement.title}
+                          width={1000}
+                          height={500}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Fallback image if the advertisement image fails to load
+                            const target = e.target as HTMLImageElement;
+                            target.src = "/images/banner1.jpeg";
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-end p-4 md:p-8">
+                          <h3 className="text-white text-xl md:text-3xl font-bold mb-1 md:mb-2">
+                            {advertisement.title}
+                          </h3>
+                          <p className="text-white/90 text-sm md:text-base mb-2 md:mb-4 max-w-md">
+                            Aproveite esta oferta especial por tempo limitado.
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-2 md:left-4 w-8 h-8 md:w-10 md:h-10 bg-white/80 hover:bg-white text-orange-500 border-none shadow-md" />
+              <CarouselNext className="right-2 md:right-4 w-8 h-8 md:w-10 md:h-10 bg-white/80 hover:bg-white text-orange-500 border-none shadow-md" />
+            </Carousel>
+          ) : (
+            <div className="w-full mb-6 md:mb-10 rounded-xl md:rounded-2xl overflow-hidden shadow-lg md:shadow-xl">
+              <Card className="h-[180px] sm:h-[250px] md:h-[400px] relative overflow-hidden border-0 shadow-none bg-gray-100">
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-gray-500 text-center">
+                    <p className="font-medium">Nenhum anúncio disponível</p>
+                    <p className="text-sm mt-1">Não há ofertas especiais no momento.</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
+        </motion.div>
 
         <Tabs
           defaultValue="overview"
@@ -453,12 +544,12 @@ const SellerDashboard = () => {
                           >
                             <div
                               className={`w-8 h-8 rounded-full flex items-center justify-center ${sale.state === "completed"
-                                  ? "bg-green-100 text-green-600"
-                                  : sale.state === "pending"
-                                    ? "bg-yellow-100 text-yellow-600"
-                                    : sale.state === "confirmed"
-                                      ? "bg-blue-100 text-blue-600"
-                                      : "bg-red-100 text-red-600"
+                                ? "bg-green-100 text-green-600"
+                                : sale.state === "pending"
+                                  ? "bg-yellow-100 text-yellow-600"
+                                  : sale.state === "confirmed"
+                                    ? "bg-blue-100 text-blue-600"
+                                    : "bg-red-100 text-red-600"
                                 }`}
                             >
                               {sale.state === "completed" ? (
@@ -484,12 +575,12 @@ const SellerDashboard = () => {
                             <div className="ml-auto">
                               <span
                                 className={`text-xs font-medium px-2 py-1 rounded-full ${sale.state === "completed"
-                                    ? "bg-green-100 text-green-600"
-                                    : sale.state === "pending"
-                                      ? "bg-yellow-100 text-yellow-600"
-                                      : sale.state === "confirmed"
-                                        ? "bg-blue-100 text-blue-600"
-                                        : "bg-red-100 text-red-600"
+                                  ? "bg-green-100 text-green-600"
+                                  : sale.state === "pending"
+                                    ? "bg-yellow-100 text-yellow-600"
+                                    : sale.state === "confirmed"
+                                      ? "bg-blue-100 text-blue-600"
+                                      : "bg-red-100 text-red-600"
                                   }`}
                               >
                                 {sale.state === "completed"

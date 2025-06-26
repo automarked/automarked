@@ -64,7 +64,7 @@ export const useUser = (userId?: string): UserContextType & {
   handleDiscardImage: (index: number) => void
   getCollaborators: () => void
   collaborators: IUser[]
-  getSupportId:  (email: string) => Promise<string | undefined>
+  getSupportId: (email: string) => Promise<string | undefined>
   deleteCollaborator: (collaboratorId: string) => Promise<boolean>
 } => {
   const context = useContext(UserContext);
@@ -92,18 +92,19 @@ export const useUser = (userId?: string): UserContextType & {
   const getSupportId = useCallback(
     async (email: string) => {
       try {
-        const response = await createdInstance.post<{ message: string | null; supportId: string }>(
-          `/support/`,
-          { email }
+        const response = await createdInstance.get(
+          `/users/email/${email}`,
         );
-  
+
         if (response.status === 200) {
-          return response.data.supportId;
+          console.log("Support Id Java:  ", response.data.userId)
+          return response.data.userId;
         } else {
           throw new Error(`Erro ao buscar suporte: ${response.status}`);
         }
       } catch (error) {
         console.error(error);
+        return undefined;
       }
     },
     []
@@ -125,7 +126,7 @@ export const useUser = (userId?: string): UserContextType & {
   const getProfile = useCallback(
     async (refetch: boolean = true) => {
       if (!userId && !refetch) {
-        
+
         const profileCache = getCookie('secure-profile')
         if (profileCache && typeof profileCache === 'object') {
           setProfile(profileCache)
@@ -140,7 +141,7 @@ export const useUser = (userId?: string): UserContextType & {
             `/users/${userId}`
           )
 
-          if (response.status === 200) {            
+          if (response.status === 200) {
             setCookie('profile-type', response.data.record.type)
             setCookie('secure-profile', response.data.record)
             setProfile(response.data.record)
@@ -227,11 +228,11 @@ export const useUser = (userId?: string): UserContextType & {
     [setProfile]
   );
 
-    // Delete collaborator function
+  // Delete collaborator function
   const deleteCollaborator = useCallback(async (collaboratorId: string) => {
     try {
       const response = await createdInstance.delete(`/users/${collaboratorId}`);
-      
+
       if (response.status === 200 || response.status === 204) {
         console.log(response);
         // Update the collaborators list by removing the deleted one
@@ -257,7 +258,7 @@ export const useUser = (userId?: string): UserContextType & {
     throw new Error('useUser deve ser usado dentro de um UserProvider');
   }
 
-   return {
+  return {
     ...context,
     profile,
     getCollaborators,
